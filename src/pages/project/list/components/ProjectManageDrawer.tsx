@@ -100,6 +100,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                   setInit(false);
                   setData(undefined);
                   setStep(0);
+                  setRequirementStepFormClientDisable(false);
                   props.projectListRef.current.reload();
                   props.onVisibleChange(false);
                 }}
@@ -128,6 +129,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                 setRequirementStepFormClientDisable(true);
                 return await getProject({id: Number(data?.id)});
               }
+              setRequirementStepFormClientDisable(false);
               const nullProject = {} as ProjectData
               return nullProject;
             }}

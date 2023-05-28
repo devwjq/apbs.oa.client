@@ -26,6 +26,18 @@ export default {
    * @name 详细的代理配置
    * @doc https://github.com/chimurai/http-proxy-middleware
    */
+  dev: {
+    '/action/': {
+      // 要代理的地址
+      target: 'http://oa.apbs.com.au',
+      changeOrigin: true,
+    },
+    '/img/upload/': {
+      // 要代理的地址
+      target: 'http://oa.apbs.com.au',
+      changeOrigin: true,
+    },
+  },
   test: {
     // localhost:8000/api/** -> https://preview.pro.ant.design/api/**
     '/api/': {

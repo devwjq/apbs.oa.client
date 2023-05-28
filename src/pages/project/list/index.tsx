@@ -86,15 +86,15 @@ const ProjectList: React.FC = () => {
         >
           <ScheduleOutlined />
         </a>,
-        <a
-          key="edit"
-          onClick={() => {
-            setCurrentRow(record);
-            handleProjectEditDrawerVisible(true);
-          }}
-        >
-          <EditOutlined />
-        </a>,
+        // <a
+        //   key="edit"
+        //   onClick={() => {
+        //     setCurrentRow(record);
+        //     handleProjectEditDrawerVisible(true);
+        //   }}
+        // >
+        //   <EditOutlined />
+        // </a>,
         <Popconfirm
           key="deleteProjectConfirm"
           title="Delete this project?"

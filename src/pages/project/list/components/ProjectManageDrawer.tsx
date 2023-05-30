@@ -1,6 +1,6 @@
 import type {Dispatch, MutableRefObject, SetStateAction} from "react";
 import React, { useRef, useState} from "react";
-import {FooterToolbar, RouteContext} from "@ant-design/pro-layout";
+import {RouteContext} from "@ant-design/pro-layout";
 import {Button, Drawer} from "antd";
 import type {InspectionData, ProjectData} from "@/pages/project/list/data";
 import type {ProFormInstance} from "@ant-design/pro-form";
@@ -34,14 +34,21 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
       // });
       setData(props.projectData);
       setStep(props.projectData.progress);
-      setInit(true);
+    } else {
+      // const serverResponse = getProject({id: Number(props.projectListData.id)});
+      // serverResponse.then((serverData) => {
+      //   projectData = serverData;
+      // });
+      setData({
+        progress: 0
+      });
+      setStep(0);
     }
+    setInit(true);
   }
 
   const changeStep = (value: number) => {
-    if(data && data.progress && value <= data?.progress) {
       setStep(value);
-    }
   };
 
   return (
@@ -62,7 +69,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               if (props.step === 0) {
                 return (
                   <div style={{textAlign: "right", marginRight: 25}}>
-                    <Button type="primary" onClick={() => props.onSubmit?.()}>
+                    <Button key="next" type="primary" onClick={() => props.onSubmit?.()} style={{marginRight: 10}}>
                       Save & Next <RightOutlined />
                     </Button>
                   </div>
@@ -70,7 +77,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               } else if (props.step === 4) {
                 return (
                   <div style={{textAlign: "right", marginRight: 25}}>
-                    <Button type="primary" onClick={() => props.onPre?.()}>
+                    <Button key="pre" type="primary" onClick={() => props.onPre?.()}>
                       <LeftOutlined /> Previous
                     </Button>
                   </div>

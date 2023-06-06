@@ -25,6 +25,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
   const requirementStepFormRef = useRef<ProFormInstance>();
   // const [requirementStepFormClientDisable, setRequirementStepFormClientDisable] = useState<boolean>(false);
   const InspectionStepFormRef = useRef<ProFormInstance>();
+  const [inspectionStepFormDisable, setInspectionStepFormDisable] = useState<boolean>(false);
 
   if(props.visible && !init) {
     if(props.projectData && props.projectData.id && props.projectData.progress) {
@@ -107,6 +108,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                   setInit(false);
                   setData(undefined);
                   setStep(0);
+                  setInspectionStepFormDisable(false);
                   // setRequirementStepFormClientDisable(false);
                   props.projectListRef.current.reload();
                   props.onVisibleChange(false);
@@ -153,7 +155,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
             formRef={InspectionStepFormRef}
             title="Inspection"
             autoFocusFirstInput
-            onFinish={async (values?: ProjectData) => {
+            onFinish={async (values?: InspectionData) => {
               if(values) {
                 const success = await updateInspection(values);
                 return success;
@@ -161,15 +163,22 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
             }}
             request={async () => {
               if(data?.id) {
-                return await getInspection({projectId: Number(data?.id)});
+                const serverResponse = await getInspection({projectId: Number(data?.id)});
+                if(serverResponse && serverResponse.hasOwnProperty("inspection_need")
+                  && !serverResponse.inspection_need) {
+                  setInspectionStepFormDisable(true);
+                }
+                return serverResponse;
               }
               const nullInspection = {} as InspectionData
               return nullInspection;
             }}
           >
             <InspectionStepForm
-              projectId={Number(data?.id)}
+              projectId = {Number(data?.id)}
               formRef = {InspectionStepFormRef}
+              inspectionDisable = {inspectionStepFormDisable}
+              setInspectionDisable = {setInspectionStepFormDisable}
             />
           </StepsForm.StepForm>
 

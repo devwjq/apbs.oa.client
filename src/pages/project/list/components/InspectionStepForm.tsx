@@ -1,4 +1,4 @@
-import type {MutableRefObject} from "react";
+import type {Dispatch, MutableRefObject, SetStateAction} from "react";
 import React, { useState} from "react";
 import styles from "@/pages/project/list/style.less";
 import {Button, Card, Col, Row} from "antd";
@@ -15,11 +15,13 @@ import {PaginationData, WorkerData} from "@/pages/project/list/data";
 type FormProps = {
   projectId?: number;
   formRef: MutableRefObject<any>;
+  inspectionDisable: boolean;
+  setInspectionDisable: Dispatch<SetStateAction<boolean>>;
 };
 
 const InspectionStepForm: React.FC<FormProps> = (props) => {
   const debug = true;
-  const [inspectionDisable, setInspectionDisable] = useState<boolean>(false);
+  // const [inspectionDisable, setInspectionDisable] = useState<boolean>(false);
   const [inspectorChooseModelVisible, handleInspectorChooseModelVisible] = useState<boolean>(false);
 
   const workerListColumns: ProColumns<WorkerData>[] = [
@@ -126,7 +128,7 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
 
   const onNeedInspectionChange = (checked: boolean) => {
     // props.formRef.current?.setFieldValue("need_inspection", checked);
-    setInspectionDisable(!checked);
+    props.setInspectionDisable(!checked);
   };
 
   return(
@@ -165,8 +167,8 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
               fieldProps={{
                 format: "YYYY-MM-DD HH:mm",
               }}
-              disabled={inspectionDisable}
-              // rules={[{required: true}]}
+              disabled={props.inspectionDisable}
+              rules={[{required: !props.inspectionDisable}]}
             />
           </Col>
           <Col span={24}>
@@ -174,13 +176,13 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
               fieldProps={{autoSize: {minRows: 3, maxRows: 5}}}
               label="Note"
               name="inspection_note"
-              disabled={inspectionDisable}
+              disabled={props.inspectionDisable}
               rules={[{required: false, message: 'Please input inspection note'}]}
               placeholder="Please input inspection note"
               initialValue="Test Note"/>
           </Col>
 
-          <Col span={24} hidden={inspectionDisable}>
+          <Col span={24} hidden={props.inspectionDisable}>
             <ProTable<InspectorData>
               headerTitle="Inspectors"
               name="inspectors"
@@ -230,7 +232,7 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
             />
           </Col>
 
-          <Col span={24} hidden={inspectionDisable}>
+          <Col span={24} hidden={props.inspectionDisable}>
             <EditableProTable<ContactData>
               headerTitle="Access Contacts"
               name="inspection_contacts"
@@ -273,11 +275,11 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
         </Row>
       </Card>
       <Card title="Report" className={styles.card} bordered={true} style={{marginTop: 20, paddingBottom: 40}}
-            hidden={inspectionDisable}>
+            hidden={props.inspectionDisable}>
         <ProFormTextArea
           name="inspection_report"
           hidden={false}
-          disabled={inspectionDisable}/>
+          disabled={props.inspectionDisable}/>
 
         <Row gutter={16}>
           <Col span={24}>

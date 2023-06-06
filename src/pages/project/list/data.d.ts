@@ -57,11 +57,12 @@ type WorkerData = {
 }
 
 type InspectionData = {
-  id: React.Key;
-  project: ProjectData;
-  need: boolean;
-  from_time: Date;
-  to_time: Date
+  inspection_id: React.Key;
+  project_id: number;
+  inspection_need: boolean;
+  inspection_time: [];
+  inspection_note: string;
+  inspection_report: string;
 }
 
 type InspectorData = {

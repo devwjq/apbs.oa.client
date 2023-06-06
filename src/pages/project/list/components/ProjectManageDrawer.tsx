@@ -23,7 +23,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
   const [step, setStep] = useState(0);
   const projectStepsFormRef = useRef<ProFormInstance>();
   const requirementStepFormRef = useRef<ProFormInstance>();
-  const [requirementStepFormClientDisable, setRequirementStepFormClientDisable] = useState<boolean>(false);
+  // const [requirementStepFormClientDisable, setRequirementStepFormClientDisable] = useState<boolean>(false);
   const InspectionStepFormRef = useRef<ProFormInstance>();
 
   if(props.visible && !init) {
@@ -107,7 +107,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                   setInit(false);
                   setData(undefined);
                   setStep(0);
-                  setRequirementStepFormClientDisable(false);
+                  // setRequirementStepFormClientDisable(false);
                   props.projectListRef.current.reload();
                   props.onVisibleChange(false);
                 }}
@@ -124,19 +124,19 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
             autoFocusFirstInput
             onFinish={async (values?: ProjectData) => {
               if(values) {
-                const isClientDisabled = requirementStepFormClientDisable;
-                setRequirementStepFormClientDisable(false);
+                // const isClientDisabled = requirementStepFormClientDisable;
+                // setRequirementStepFormClientDisable(false);
                 const success = await updateProject(values);
-                setRequirementStepFormClientDisable(isClientDisabled);
+                // setRequirementStepFormClientDisable(isClientDisabled);
                 return success;
               }
             }}
             request={async () => {
               if(data?.id) {
-                setRequirementStepFormClientDisable(true);
+                // setRequirementStepFormClientDisable(true);
                 return await getProject({id: Number(data?.id)});
               }
-              setRequirementStepFormClientDisable(false);
+              // setRequirementStepFormClientDisable(false);
               const nullProject = {} as ProjectData
               return nullProject;
             }}
@@ -144,8 +144,8 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
             <RequirementStepForm
               projectId = {Number(data?.id)}
               formRef = {requirementStepFormRef}
-              clientDisable = {requirementStepFormClientDisable}
-              setClientDisable = {setRequirementStepFormClientDisable}
+              // clientDisable = {requirementStepFormClientDisable}
+              // setClientDisable = {setRequirementStepFormClientDisable}
             />
           </StepsForm.StepForm>
 
@@ -172,6 +172,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               formRef = {InspectionStepFormRef}
             />
           </StepsForm.StepForm>
+
           <StepsForm.StepForm<ProjectData>
             title="Quota"
             // initialValues={data}

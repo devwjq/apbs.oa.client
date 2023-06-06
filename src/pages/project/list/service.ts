@@ -127,6 +127,22 @@ export async function updateProject(values: Record<string, any>) {
   });
 }
 
+export async function deleteProject (
+  params: {
+    id: number;
+  },
+) {
+  return request('/action/project/delete', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params:{
+      ...params,
+    },
+  });
+}
+
 export async function queryWorkers (
   params: {
     current?: number; /** 当前的页码 */

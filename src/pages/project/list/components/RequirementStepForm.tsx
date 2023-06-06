@@ -1,4 +1,4 @@
-import type {Dispatch, MutableRefObject, SetStateAction} from "react";
+import type {MutableRefObject} from "react";
 import React, { useState} from "react";
 import {
   ProFormDatePicker,
@@ -14,21 +14,22 @@ import {
   getProjectContacts,
   queryClients
 } from "@/pages/project/list/service";
-import {Button, Card, Col, Form, message, Popconfirm, Row, Space} from "antd";
+import {Button, Card, Col, Form, message, Row, Space} from "antd";
 import styles from "@/pages/project/list/style.less";
 import type { ProColumns} from "@ant-design/pro-table";
 import ProTable, {EditableProTable} from "@ant-design/pro-table";
-import {EditOutlined, RedoOutlined, SearchOutlined} from "@ant-design/icons";
+import {EditOutlined, SearchOutlined} from "@ant-design/icons";
 import type {ClientData, ContactData, PaginationData} from "@/pages/project/list/data";
 
 type FormProps = {
   projectId?: number;
   formRef: MutableRefObject<any>;
-  clientDisable: boolean;
-  setClientDisable: Dispatch<SetStateAction<boolean>>;
+  // clientDisable: boolean;
+  // setClientDisable: Dispatch<SetStateAction<boolean>>;
 };
 
 const RequirementStepForm: React.FC<FormProps> = (props) => {
+  const debug = true;
   // const formRef = useRef<ProFormInstance>();
   const [contactEditableForm] = Form.useForm();
   // const [clientDisable, setClientDisable] = useState<boolean>(false);
@@ -139,36 +140,36 @@ const RequirementStepForm: React.FC<FormProps> = (props) => {
     },
   ];
 
-  const refillClientConfirm = (e?: React.MouseEvent<HTMLElement>) => {
-    props.formRef.current?.setFieldValue(['client', 'id'], null);
-    props.formRef.current?.setFieldValue(['client', 'name'], null);
-    props.formRef.current?.setFieldValue(['client', 'type'], null);
-    props.formRef.current?.setFieldValue(['client', 'phone'], null);
-    props.formRef.current?.setFieldValue(['client', 'email'], null);
-    props.formRef.current?.setFieldValue(['client', 'company'], null);
-    props.formRef.current?.setFieldValue(['client', 'abn'], null);
-    props.formRef.current?.setFieldValue(['client', 'address'], null);
-    props.setClientDisable(false);
-  };
+  // const refillClientConfirm = (e?: React.MouseEvent<HTMLElement>) => {
+  //   props.formRef.current?.setFieldValue(['client', 'id'], null);
+  //   props.formRef.current?.setFieldValue(['client', 'name'], null);
+  //   props.formRef.current?.setFieldValue(['client', 'type'], null);
+  //   props.formRef.current?.setFieldValue(['client', 'phone'], null);
+  //   props.formRef.current?.setFieldValue(['client', 'email'], null);
+  //   props.formRef.current?.setFieldValue(['client', 'company'], null);
+  //   props.formRef.current?.setFieldValue(['client', 'abn'], null);
+  //   props.formRef.current?.setFieldValue(['client', 'address'], null);
+  //   props.setClientDisable(false);
+  // };
 
   return(
     <>
       <Card title="Client" className={styles.card} bordered={true}
         extra={
           <Space size="middle">
-            <Popconfirm
-              title="Refill client information?"
-              onConfirm={refillClientConfirm}
-              okText="Yes"
-              cancelText="No"
-            >
-              <Button
-                type="primary"
-                key="refillClient"
-              >
-                <RedoOutlined /> Refill
-              </Button>
-            </Popconfirm>
+            {/*<Popconfirm*/}
+            {/*  title="Refill client information?"*/}
+            {/*  onConfirm={refillClientConfirm}*/}
+            {/*  okText="Yes"*/}
+            {/*  cancelText="No"*/}
+            {/*>*/}
+            {/*  <Button*/}
+            {/*    type="primary"*/}
+            {/*    key="refillClient"*/}
+            {/*  >*/}
+            {/*    <RedoOutlined /> Refill*/}
+            {/*  </Button>*/}
+            {/*</Popconfirm>*/}
             <Button
               type="primary"
               key="findClient"
@@ -183,12 +184,9 @@ const RequirementStepForm: React.FC<FormProps> = (props) => {
       >
         <ProFormText
           name={['client', 'id']}
-          hidden={false}
-          fieldProps={{
-            // onChange: (e) => {
-            //   console.log("client_id change to: " + e.target.value);
-            // },
-          }}
+          hidden={!debug}
+          // rules={[{required: true, message: 'Please choose a client'}]}
+          placeholder="Please choose a client"
         />
 
         <Row gutter={16}>
@@ -196,16 +194,16 @@ const RequirementStepForm: React.FC<FormProps> = (props) => {
             <ProFormText
               label="Client Name"
               name={['client', 'name']}
-              disabled={props.clientDisable}
-              rules={[{required: true, message: 'Please input client name'}]}
-              placeholder="Please input client name"
-              initialValue="Test Client"/>
+              // disabled={props.clientDisable}
+              disabled={true}
+              rules={[{required: true, message: 'Please input client name'}]}/>
           </Col>
           <Col lg={6} md={12} sm={24}>
             <ProFormSelect
               label="Client Type"
               name={['client', 'client_type_id']}
-              disabled={props.clientDisable}
+              // disabled={props.clientDisable}
+              disabled={true}
               rules={[{required: true, message: 'Please choose client type'}]}
               // request={getClientTypes}
               request={async () => {
@@ -218,63 +216,56 @@ const RequirementStepForm: React.FC<FormProps> = (props) => {
                   });
                 });
                 return selectValues;
-              }}
-              placeholder="Please choose client type"
-              initialValue={1}/>
+              }}/>
           </Col>
           <Col lg={6} md={12} sm={24}>
             <ProFormText
               label="Phone"
               name={['client', 'phone']}
-              disabled={props.clientDisable}
+              // disabled={props.clientDisable}
+              disabled={true}
               rules={[{required: false, message: 'Please input client phone'},
-                {pattern: /^(0[1-9])\d{8}$/, message: 'Please input correct phone number'}]}
-              placeholder="Please input client phone"
-              initialValue="0123456789"/>
+                {pattern: /^(0[1-9])\d{8}$/, message: 'Please input correct phone number'}]}/>
           </Col>
           <Col lg={6} md={12} sm={24}>
             <ProFormText
               label="Email"
               name={['client', 'email']}
-              disabled={props.clientDisable}
-              rules={[{required: false, type: "email", whitespace: false, message: 'Please input client email'}]}
-              placeholder="Please input client email"
-              initialValue="TestClient@test.com"/>
+              // disabled={props.clientDisable}
+              disabled={true}
+              rules={[{required: false, type: "email", whitespace: false, message: 'Please input client email'}]}/>
           </Col>
           <Col lg={6} md={12} sm={24}>
             <ProFormText
               label="Company Name"
               name={['client', 'company']}
-              disabled={props.clientDisable}
-              rules={[{required: false, message: 'Please input company name'}]}
-              placeholder="Please input company name"
-              initialValue="Test Company"/>
+              // disabled={props.clientDisable}
+              disabled={true}
+              rules={[{required: false, message: 'Please input company name'}]}/>
           </Col>
           <Col lg={6} md={12} sm={24}>
             <ProFormText
               label="Company ABN"
               name={['client', 'abn']}
-              disabled={props.clientDisable}
+              // disabled={props.clientDisable}
+              disabled={true}
               rules={[{required: false, message: 'Please input company ABN'},
-                {pattern: /^\d{11}$/, message: 'Please input correct ABN number'}]}
-              placeholder="Please input company ABN"
-              initialValue="12345678901"/>
+                {pattern: /^\d{11}$/, message: 'Please input correct ABN number'}]}/>
           </Col>
           <Col lg={12} md={24} sm={24}>
             <ProFormText
               label="Company Address"
               name={['client', 'address']}
-              disabled={props.clientDisable}
-              rules={[{required: false, message: 'Please input client address'}]}
-              placeholder="Please input client address"
-              initialValue="Test Client Address"/>
+              // disabled={props.clientDisable}
+              disabled={true}
+              rules={[{required: false, message: 'Please input client address'}]}/>
           </Col>
         </Row>
       </Card>
       <Card title="Project Detail" className={styles.card} bordered={true} style={{marginTop: 20}}>
         <ProFormText
           name="id"
-          hidden={false}
+          hidden={!debug}
           initialValue={props.projectId}/>
         <Row gutter={16}>
           <Col lg={6} md={12} sm={24}>
@@ -440,7 +431,7 @@ const RequirementStepForm: React.FC<FormProps> = (props) => {
             props.formRef.current?.setFieldValue(['client', 'company'], chosenClient.company);
             props.formRef.current?.setFieldValue(['client', 'abn'], chosenClient.abn);
             props.formRef.current?.setFieldValue(['client', 'address'], chosenClient.address);
-            props.setClientDisable(true);
+            // props.setClientDisable(true);
           }
 
           handleClientChooseModelVisible(false);
@@ -473,7 +464,11 @@ const RequirementStepForm: React.FC<FormProps> = (props) => {
                 },
               }}
               request={queryClients}
-              columns={clientListColumns}/>
+              columns={clientListColumns}
+              pagination={{
+                pageSize: 8
+              }}
+            />
           </Col>
         </Row>
       </ModalForm>

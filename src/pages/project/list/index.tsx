@@ -1,25 +1,28 @@
-import {DeleteOutlined, EditOutlined, PlusOutlined, ScheduleOutlined} from '@ant-design/icons';
+import {DeleteOutlined, PlusOutlined, ScheduleOutlined} from '@ant-design/icons';
 import {Button, Popconfirm, Progress} from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import {queryProjects} from './service';
+import {deleteProject, queryProjects} from './service';
 import styles from "@/pages/project/list/style.less";
-import ProjectEditDrawer from "@/pages/project/list/components/ProjectEditDrawer";
 import ProTable from "@ant-design/pro-table";
 import type {PaginationData, ProjectData} from "@/pages/project/list/data";
 import ProjectManageDrawer from "@/pages/project/list/components/ProjectManageDrawer";
 
 const ProjectList: React.FC = () => {
-  const [projectEditDrawerVisible, handleProjectEditDrawerVisible] = useState<boolean>(false);
+  // const [projectEditDrawerVisible, handleProjectEditDrawerVisible] = useState<boolean>(false);
   const [projectManageDrawerVisible, handleProjectManageDrawerVisible] = useState<boolean>(false);
 
   const listRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<ProjectData>();
 
-  const deleteProjectConfirm = (e?: React.MouseEvent<HTMLElement>) => {
+  const deleteConfirm = async (id: number) => {
+    const success = await deleteProject({id: id});
 
-  };
+    if (success && listRef.current) {
+      listRef.current.reload();
+    }
+  }
 
   const projectListColumns: ProColumns<ProjectData>[] = [
     {
@@ -98,19 +101,14 @@ const ProjectList: React.FC = () => {
         <Popconfirm
           key="deleteProjectConfirm"
           title="Delete this project?"
-          onConfirm={deleteProjectConfirm}
+          onConfirm={(e)=>{
+            setCurrentRow(record);
+            deleteConfirm(Number(record.id));
+          }}
           okText="Yes"
           cancelText="No"
         >
-          <a
-            key="delete"
-            onClick={() => {
-              //TODO： 删除数据
-              if (listRef.current) {
-                listRef.current.reload();
-              }
-            }}
-          >
+          <a>
             <DeleteOutlined />
           </a>
         </Popconfirm>,
@@ -160,12 +158,12 @@ const ProjectList: React.FC = () => {
         columns={projectListColumns}
       />
 
-      <ProjectEditDrawer
-        projectListRef={listRef}
-        visible={projectEditDrawerVisible}
-        onVisibleChange={handleProjectEditDrawerVisible}
-        projectId={Number(currentRow?.id)}
-      />
+      {/*<ProjectEditDrawer*/}
+      {/*  projectListRef={listRef}*/}
+      {/*  visible={projectEditDrawerVisible}*/}
+      {/*  onVisibleChange={handleProjectEditDrawerVisible}*/}
+      {/*  projectId={Number(currentRow?.id)}*/}
+      {/*/>*/}
 
       <ProjectManageDrawer
         projectData={currentRow}

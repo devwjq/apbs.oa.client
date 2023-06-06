@@ -18,6 +18,7 @@ type FormProps = {
 };
 
 const InspectionStepForm: React.FC<FormProps> = (props) => {
+  const debug = true;
   const [inspectionDisable, setInspectionDisable] = useState<boolean>(false);
   const [inspectorChooseModelVisible, handleInspectorChooseModelVisible] = useState<boolean>(false);
 
@@ -124,7 +125,10 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
   ];
 
   const onNeedInspectionChange = (checked: boolean) => {
-    props.formRef.current?.setFieldValue("need_inspection", checked);
+    setTimeout(()=>{
+      // props.formRef.current?.setFieldValue("need_inspection", checked);
+    },100)
+    // props.formRef.current?.setFieldValue("need_inspection", checked);
     setInspectionDisable(!checked);
   };
 
@@ -133,14 +137,14 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
       <Card title="Arrangement" className={styles.card} bordered={true}>
         <ProFormText
           name="id"
-          hidden={false}/>
+          hidden={!debug}/>
         <ProFormText
           name="project_id"
-          hidden={false}
+          hidden={!debug}
           initialValue={props.projectId}/>
         <ProFormText
           name="need_inspection"
-          hidden={false}
+          hidden={!debug}
           initialValue={true}/>
 
         <Row gutter={16}>

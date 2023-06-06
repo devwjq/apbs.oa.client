@@ -15,7 +15,7 @@ export default [
     name: 'Project',
     icon: 'profile',
     path: '/project',
-    // hideChildrenInMenu: true,
+    hideChildrenInMenu: true,
     routes: [
       {
         path: '/project',

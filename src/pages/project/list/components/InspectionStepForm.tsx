@@ -125,9 +125,6 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
   ];
 
   const onNeedInspectionChange = (checked: boolean) => {
-    setTimeout(()=>{
-      // props.formRef.current?.setFieldValue("need_inspection", checked);
-    },100)
     // props.formRef.current?.setFieldValue("need_inspection", checked);
     setInspectionDisable(!checked);
   };
@@ -136,21 +133,22 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
     <>
       <Card title="Arrangement" className={styles.card} bordered={true}>
         <ProFormText
-          name="id"
+          name="inspection_id"
           hidden={!debug}/>
         <ProFormText
           name="project_id"
           hidden={!debug}
           initialValue={props.projectId}/>
-        <ProFormText
-          name="need_inspection"
-          hidden={!debug}
-          initialValue={true}/>
+        {/*<ProFormText*/}
+        {/*  name="need_inspection"*/}
+        {/*  hidden={!debug}*/}
+        {/*  disabled={inspectionDisable}*/}
+        {/*  initialValue={true}/>*/}
 
         <Row gutter={16}>
           <Col lg={6} md={12} sm={24}>
             <ProFormSwitch
-              name="need_inspection_switch"
+              name="inspection_need"
               label="Need inspection? "
               fieldProps={{
                 checkedChildren: "Yes",
@@ -160,7 +158,7 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
               }}
             />
           </Col>
-          <Col span={24}>
+          <Col lg={12} md={12} sm={24}>
             <ProFormDateTimeRangePicker
               name="inspection_time"
               label="Inspection Time"
@@ -168,7 +166,7 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
                 format: "YYYY-MM-DD HH:mm",
               }}
               disabled={inspectionDisable}
-              rules={[{required: true}]}
+              // rules={[{required: true}]}
             />
           </Col>
           <Col span={24}>

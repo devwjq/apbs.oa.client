@@ -16,13 +16,13 @@ import {
   getProjectTypes,
   queryClients,
   getProject, getProjectContacts
-} from "@/pages/project/list/service";
+} from "@/pages/service";
 import {Button, Card, Col, Form, message, Popconfirm, Row, Space} from "antd";
 import styles from "@/pages/project/list/style.less";
 import type { ProColumns} from "@ant-design/pro-table";
 import ProTable, {EditableProTable} from "@ant-design/pro-table";
 import {EditOutlined, RedoOutlined, SearchOutlined} from "@ant-design/icons";
-import type {ClientData, ContactData, PaginationData, ProjectData} from "@/pages/project/list/data";
+import {ClientData, PaginationData, ContactData, ProjectData} from "@/pages/data";
 
 type FormProps = {
   projectListRef: MutableRefObject<any>;

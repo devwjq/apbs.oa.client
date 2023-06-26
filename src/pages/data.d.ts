@@ -6,18 +6,6 @@ type PaginationData = {
   current: number;
 };
 
-export type ClientData = {
-  id: React.Key;
-  name?: string;
-  client_type_id?: number;
-  phone?: string;
-  email?: string;
-  company?: string;
-  abn?: string;
-  address?: string;
-  update_time?: Date;
-}
-
 export type ProjectTypeData = {
   id: React.Key
   name: string
@@ -40,12 +28,16 @@ export type ProjectData = {
   create_time?: Date;
 }
 
-type ContactData = {
+export type ClientData = {
   id: React.Key;
-  role?: number;
   name?: string;
+  client_type_id?: number;
   phone?: string;
   email?: string;
+  company?: string;
+  abn?: string;
+  address?: string;
+  update_time?: Date;
 }
 
 type WorkerData = {
@@ -54,6 +46,14 @@ type WorkerData = {
   phone?: string;
   email?: string;
   company?: string;
+}
+
+type ContactData = {
+  id: React.Key;
+  role?: number;
+  name?: string;
+  phone?: string;
+  email?: string;
 }
 
 type InspectionData = {
@@ -74,14 +74,3 @@ type InspectorData = {
   phone?: string;
   email?: string;
 }
-
-export type TableListParams = {
-  status?: string;
-  name?: string;
-  desc?: string;
-  key?: number;
-  pageSize?: number;
-  currentPage?: number;
-  filter?: Record<string, any[]>;
-  sorter?: Record<string, any>;
-};

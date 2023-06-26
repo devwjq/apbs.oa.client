@@ -13,13 +13,13 @@ import {
   getProjectTypes,
   getProjectContacts,
   queryClients
-} from "@/pages/project/list/service";
+} from "@/pages/service";
 import {Button, Card, Col, Form, message, Row, Space} from "antd";
 import styles from "@/pages/project/list/style.less";
 import type { ProColumns} from "@ant-design/pro-table";
 import ProTable, {EditableProTable} from "@ant-design/pro-table";
 import {EditOutlined, SearchOutlined} from "@ant-design/icons";
-import type {ClientData, ContactData, PaginationData} from "@/pages/project/list/data";
+import {ClientData, ContactData, PaginationData} from "@/pages/data";
 
 type FormProps = {
   projectId?: number;

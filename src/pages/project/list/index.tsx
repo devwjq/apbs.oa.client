@@ -3,10 +3,10 @@ import {Button, Popconfirm, Progress} from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import {deleteProject, queryProjects} from './service';
+import {deleteProject, queryProjects} from '@/pages/service';
 import styles from "@/pages/project/list/style.less";
 import ProTable from "@ant-design/pro-table";
-import type {PaginationData, ProjectData} from "@/pages/project/list/data";
+import type {PaginationData, ProjectData} from "@/pages/data";
 import ProjectManageDrawer from "@/pages/project/list/components/ProjectManageDrawer";
 
 const ProjectList: React.FC = () => {

@@ -2,13 +2,12 @@
 /* eslint-disable */
 import { request } from 'umi';
 import {
-  ClientData,
   ContactData,
   InspectionData,
   InspectorData,
   ProjectData,
-  WorkerData
-} from "@/pages/project/list/data";
+} from "@/pages/data";
+import {ClientData, WorkerData} from "@/pages/data";
 
 export async function getClientTypes() {
   return request('/action/client/getTypes', {
@@ -164,6 +163,22 @@ export async function queryWorkers (
       ...params,
     },
     ...(options || {}),
+  });
+}
+
+export async function deleteWorker (
+  params: {
+    id: number;
+  },
+) {
+  return request('/action/worker/delete', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params:{
+      ...params,
+    },
   });
 }
 

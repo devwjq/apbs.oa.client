@@ -2,15 +2,14 @@ import type {Dispatch, MutableRefObject, SetStateAction} from "react";
 import React, { useState} from "react";
 import styles from "@/pages/project/list/style.less";
 import {Button, Card, Col, Row} from "antd";
-import type {ContactData, InspectorData} from "@/pages/project/list/data";
 import type { ProColumns} from "@ant-design/pro-table";
 import ProTable, {EditableProTable} from "@ant-design/pro-table";
-import {ModalForm, ProFormDateTimeRangePicker, ProFormSwitch, ProFormText, ProFormTextArea} from "@ant-design/pro-form";
+import {ProForm, ModalForm, ProFormDateTimeRangePicker, ProFormSwitch, ProFormText, ProFormTextArea} from "@ant-design/pro-form";
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
-import {getInspectionContacts, getInspectors, queryWorkers} from "@/pages/project/list/service";
-import {PaginationData, WorkerData} from "@/pages/project/list/data";
+import {getInspectionContacts, getInspectors, queryWorkers} from "@/pages/service";
+import {WorkerData, ContactData, InspectorData, PaginationData} from "@/pages/data";
 
 type FormProps = {
   projectId?: number;
@@ -276,11 +275,6 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
       </Card>
       <Card title="Report" className={styles.card} bordered={true} style={{marginTop: 20, paddingBottom: 40}}
             hidden={props.inspectionDisable}>
-        <ProFormTextArea
-          name="inspection_report"
-          hidden={false}
-          disabled={props.inspectionDisable}/>
-
         <Row gutter={16}>
           <Col span={24}>
             {/*<ProFormTextArea*/}
@@ -290,22 +284,25 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
             {/*  rules={[{required: false, message: 'Please input inspection report'}]}*/}
             {/*  placeholder="Please input inspection report"*/}
             {/*  initialValue="Test report"/>*/}
-            <ReactQuill
-              theme="snow"
-              style={{
-                height: "500px",
-              }}
-              modules={{
-                toolbar: [
-                  [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
-                  [{size: []}],
-                  ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                  [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
-                  ['link', 'image', 'video'],
-                  ['clean']
-                ]
-              }}
-            />
+            <ProForm.Item
+              name="inspection_report">
+              <ReactQuill
+                theme="snow"
+                style={{
+                  height: "500px",
+                }}
+                modules={{
+                  toolbar: [
+                    [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
+                    [{size: []}],
+                    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                    [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+                    ['link', 'image', 'video'],
+                    ['clean']
+                  ]
+                }}
+              />
+            </ProForm.Item>
           </Col>
         </Row>
       </Card>

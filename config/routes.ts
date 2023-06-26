@@ -12,19 +12,29 @@
  */
 export default [
   {
-    name: 'Project',
+    name: 'Business',
     icon: 'profile',
     path: '/project',
-    hideChildrenInMenu: true,
+    // hideChildrenInMenu: true,
     routes: [
-      {
-        path: '/project',
-        redirect: '/project/list',
-      },
+      // {
+      //   path: '/project',
+      //   redirect: '/project/list',
+      // },
       {
         name: 'Project',
         path: '/project/list',
         component: './project/list',
+      },
+      // {
+      //   name: 'Client',
+      //   path: '/project/client',
+      //   component: './project/client',
+      // },
+      {
+        name: 'Worker',
+        path: '/project/worker',
+        component: './project/worker',
       },
     ],
   },

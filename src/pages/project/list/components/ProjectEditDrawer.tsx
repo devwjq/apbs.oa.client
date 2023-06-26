@@ -10,19 +10,14 @@ import {
   ProFormTextArea,
   ProFormUploadButton
 } from "@ant-design/pro-form";
-import {
-  updateProject,
-  getClientTypes,
-  getProjectTypes,
-  queryClients,
-  getProject, getProjectContacts
-} from "@/pages/service";
 import {Button, Card, Col, Form, message, Popconfirm, Row, Space} from "antd";
 import styles from "@/pages/project/list/style.less";
 import type { ProColumns} from "@ant-design/pro-table";
 import ProTable, {EditableProTable} from "@ant-design/pro-table";
 import {EditOutlined, RedoOutlined, SearchOutlined} from "@ant-design/icons";
-import {ClientData, PaginationData, ContactData, ProjectData} from "@/pages/data";
+import {ClientData, PaginationData, ContactData, ProjectData} from "@/services/data";
+import {getProject, getProjectContacts, getProjectTypes, updateProject} from "@/services/project";
+import {getClientTypes, queryClients} from "@/services/client";
 
 type FormProps = {
   projectListRef: MutableRefObject<any>;

@@ -1,14 +1,15 @@
 import {DeleteOutlined, EditOutlined, PlusOutlined} from '@ant-design/icons';
-import {Button, Popconfirm} from 'antd';
+import {Button, Col, Popconfirm, Row} from 'antd';
 import React, { useState, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from "@ant-design/pro-table";
-import {PaginationData, WorkerData} from "@/pages/data";
-import {deleteWorker, queryWorkers} from "@/pages/service";
+import {PaginationData, WorkerData} from "@/services/data";
+import {ModalForm, ProFormText} from "@ant-design/pro-form";
+import {deleteWorker, queryWorkers} from "@/services/worker";
 
 const WorkerList: React.FC = () => {
-  const [workerEditDrawerVisible, handleWorkerEditDrawerVisible] = useState<boolean>(false);
+  const [workerEditModalVisible, handleWorkerEditModalVisible] = useState<boolean>(false);
   const listRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<WorkerData>();
 
@@ -52,7 +53,7 @@ const WorkerList: React.FC = () => {
           key="edit"
           onClick={() => {
             setCurrentRow(record);
-            handleWorkerEditDrawerVisible(true);
+            handleWorkerEditModalVisible(true);
           }}
         >
           <EditOutlined />
@@ -87,11 +88,10 @@ const WorkerList: React.FC = () => {
         toolBarRender={() => [
           <Button
             type="primary"
-            key="projectAddButton"
+            key="workerAddButton"
             onClick={() => {
               setCurrentRow(undefined);
-              // handleProjectEditDrawerVisible(true);
-              handleWorkerEditDrawerVisible(true);
+              handleWorkerEditModalVisible(true);
             }}
           >
             <PlusOutlined /> New
@@ -110,19 +110,63 @@ const WorkerList: React.FC = () => {
             },
           },
         }}
-        // scroll={{
-        //   x: 980,
-        // }}
         request={queryWorkers}
         columns={workerListColumns}
       />
 
-      {/*<ProjectManageDrawer*/}
-      {/*  projectData={currentRow}*/}
-      {/*  projectListRef={listRef}*/}
-      {/*  visible={projectManageDrawerVisible}*/}
-      {/*  onVisibleChange={handleProjectManageDrawerVisible}*/}
-      {/*/>*/}
+      <ModalForm
+        title="Worker"
+        autoFocusFirstInput
+        modalProps={{
+          destroyOnClose: true,
+        }}
+        submitter={{
+          searchConfig: {
+            submitText: 'Save',
+            resetText: 'Cancel',
+          },
+        }}
+        open={workerEditModalVisible}
+        onOpenChange={handleWorkerEditModalVisible}
+        onFinish={async(values) => {
+
+          handleWorkerEditModalVisible(false);
+        }}
+      >
+        <Row gutter={16}>
+          <Col lg={12} md={12} sm={24}>
+            <ProFormText
+              name="name"
+              label="Name"
+              rules={[{required: true, message: 'Please input worker name'}]}
+              placeholder="Worker Name"
+            />
+          </Col>
+          <Col lg={12} md={12} sm={24}>
+            <ProFormText
+              name="phone"
+              label="Phone"
+              rules={[{required: false, message: 'Please input phone number'},
+                {pattern: /^(0[1-9])\d{8}$/, message: 'Please input correct phone number'}]}
+              placeholder="Phone Number"
+            />
+          </Col>
+          <Col lg={12} md={12} sm={24}>
+            <ProFormText
+              name="company"
+              label="Company"
+              placeholder="Company Name"
+            />
+          </Col>
+          <Col lg={12} md={12} sm={24}>
+            <ProFormText
+              name="email"
+              label="Email"
+              placeholder="Email"
+            />
+          </Col>
+        </Row>
+      </ModalForm>
     </PageContainer>
   );
 };

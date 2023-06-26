@@ -2,13 +2,14 @@ import type {Dispatch, MutableRefObject, SetStateAction} from "react";
 import React, { useRef, useState} from "react";
 import {RouteContext} from "@ant-design/pro-layout";
 import {Button, Drawer} from "antd";
-import type {InspectionData, ProjectData} from "@/pages/data";
+import type {InspectionData, ProjectData} from "@/services/data";
 import type {ProFormInstance} from "@ant-design/pro-form";
 import {StepsForm} from "@ant-design/pro-form";
 import RequirementStepForm from "@/pages/project/list/components/RequirementStepForm";
 import InspectionStepForm from "@/pages/project/list/components/InspectionStepForm";
 import {LeftOutlined, RightOutlined} from "@ant-design/icons";
-import {getInspection, getProject, updateInspection, updateProject} from "@/pages/service";
+import {getProject, updateProject} from "@/services/project";
+import {getInspection, updateInspection} from "@/services/inspection";
 
 type FormProps = {
   projectData?: ProjectData;

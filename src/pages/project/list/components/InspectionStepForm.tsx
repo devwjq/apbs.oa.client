@@ -8,8 +8,9 @@ import {ProForm, ModalForm, ProFormDateTimeRangePicker, ProFormSwitch, ProFormTe
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
-import {getInspectionContacts, getInspectors, queryWorkers} from "@/pages/service";
-import {WorkerData, ContactData, InspectorData, PaginationData} from "@/pages/data";
+import {WorkerData, ContactData, InspectorData, PaginationData} from "@/services/data";
+import {getInspectionContacts, getInspectors} from "@/services/inspection";
+import {queryWorkers} from "@/services/worker";
 
 type FormProps = {
   projectId?: number;

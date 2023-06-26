@@ -8,18 +8,14 @@ import {
   ProFormUploadButton,
   ModalForm,
 } from "@ant-design/pro-form";
-import {
-  getClientTypes,
-  getProjectTypes,
-  getProjectContacts,
-  queryClients
-} from "@/pages/service";
 import {Button, Card, Col, Form, message, Row, Space} from "antd";
 import styles from "@/pages/project/list/style.less";
 import type { ProColumns} from "@ant-design/pro-table";
 import ProTable, {EditableProTable} from "@ant-design/pro-table";
 import {EditOutlined, SearchOutlined} from "@ant-design/icons";
-import {ClientData, ContactData, PaginationData} from "@/pages/data";
+import {ClientData, ContactData, PaginationData} from "@/services/data";
+import {getClientTypes, queryClients} from "@/services/client";
+import {getProjectContacts, getProjectTypes} from "@/services/project";
 
 type FormProps = {
   projectId?: number;

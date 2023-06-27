@@ -26,11 +26,11 @@ export default [
         path: '/project/list',
         component: './project/list',
       },
-      // {
-      //   name: 'Client',
-      //   path: '/project/client',
-      //   component: './project/client',
-      // },
+      {
+        name: 'Client',
+        path: '/project/client',
+        component: './project/client',
+      },
       {
         name: 'Worker',
         path: '/project/worker',

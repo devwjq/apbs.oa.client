@@ -11,6 +11,7 @@ import 'react-quill/dist/quill.snow.css';
 import {WorkerData, ContactData, InspectorData, PaginationData} from "@/services/data";
 import {getInspectionContacts, getInspectors} from "@/services/inspection";
 import {queryWorkers} from "@/services/worker";
+import {debug} from "@/pages/Env";
 
 type FormProps = {
   projectId?: number;
@@ -20,25 +21,31 @@ type FormProps = {
 };
 
 const InspectionStepForm: React.FC<FormProps> = (props) => {
-  const debug = true;
   // const [inspectionDisable, setInspectionDisable] = useState<boolean>(false);
   const [inspectorChooseModelVisible, handleInspectorChooseModelVisible] = useState<boolean>(false);
 
   const workerListColumns: ProColumns<WorkerData>[] = [
     {
+      title: 'ID',
+      dataIndex: 'id',
+      hideInSearch: true,
+      sorter: true,
+    },
+    {
       title: 'Name',
       dataIndex: 'name',
-      key: 'name',
+    },
+    {
+      title: 'Company',
+      dataIndex: 'company',
     },
     {
       title: 'Phone',
       dataIndex: 'phone',
-      key: 'phone',
     },
     {
       title: 'Email',
       dataIndex: 'email',
-      key: 'email',
     },
   ];
 
@@ -278,13 +285,6 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
             hidden={props.inspectionDisable}>
         <Row gutter={16}>
           <Col span={24}>
-            {/*<ProFormTextArea*/}
-            {/*  fieldProps={{autoSize: {minRows: 20}}}*/}
-            {/*  name="inspection_report"*/}
-            {/*  disabled={inspectionDisable}*/}
-            {/*  rules={[{required: false, message: 'Please input inspection report'}]}*/}
-            {/*  placeholder="Please input inspection report"*/}
-            {/*  initialValue="Test report"/>*/}
             <ProForm.Item
               name="inspection_report">
               <ReactQuill
@@ -320,8 +320,8 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
             resetText: 'Cancel',
           },
         }}
-        visible={inspectorChooseModelVisible}
-        onVisibleChange={handleInspectorChooseModelVisible}
+        open={inspectorChooseModelVisible}
+        onOpenChange={handleInspectorChooseModelVisible}
         onFinish={async(values) => {
           handleInspectorChooseModelVisible(false);
         }}
@@ -335,16 +335,6 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
                 labelWidth: "auto",
                 filterType: "query",
               }}
-              columnsState={{
-                defaultValue: { // 配置初始值；如果配置了持久化，仅第一次生效（没有缓存的第一次），后续都按缓存处理。
-                  phone: {
-                    show: false,
-                  },
-                  email: {
-                    show: false,
-                  },
-                },
-              }}
               tableAlertRender={false}
               rowSelection={{
                 // type: "radio",
@@ -353,7 +343,11 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
                 },
               }}
               request={queryWorkers}
-              columns={workerListColumns}/>
+              columns={workerListColumns}
+              pagination={{
+                pageSize: 8
+              }}
+            />
           </Col>
         </Row>
       </ModalForm>

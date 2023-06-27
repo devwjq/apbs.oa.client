@@ -6,7 +6,8 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from "@ant-design/pro-table";
 import {PaginationData, WorkerData} from "@/services/data";
 import {ModalForm, ProFormText} from "@ant-design/pro-form";
-import {deleteWorker, queryWorkers} from "@/services/worker";
+import {deleteWorker, queryWorkers, updateWorker} from "@/services/worker";
+import {debug} from "@/pages/Env";
 
 const WorkerList: React.FC = () => {
   const [workerEditModalVisible, handleWorkerEditModalVisible] = useState<boolean>(false);
@@ -23,9 +24,15 @@ const WorkerList: React.FC = () => {
 
   const workerListColumns: ProColumns<WorkerData>[] = [
     {
+      title: 'User ID',
+      dataIndex: 'user_id',
+      hideInSearch: true,
+      hideInTable: true,
+    },
+    {
       title: 'ID',
       dataIndex: 'id',
-      hideInSearch:true,
+      hideInSearch: true,
       sorter: true,
     },
     {
@@ -35,7 +42,6 @@ const WorkerList: React.FC = () => {
     {
       title: 'Company',
       dataIndex: 'company',
-      hideInForm: true,
     },
     {
       title: 'Phone',
@@ -48,31 +54,33 @@ const WorkerList: React.FC = () => {
     {
       title: 'Action',
       valueType: 'option',
-      render: (_, record) => [
-        <a
-          key="edit"
-          onClick={() => {
-            setCurrentRow(record);
-            handleWorkerEditModalVisible(true);
-          }}
-        >
-          <EditOutlined />
-        </a>,
-        <Popconfirm
-          key="deleteWorkerConfirm"
-          title="Delete this worker?"
-          onConfirm={(e)=>{
-            setCurrentRow(record);
-            deleteConfirm(Number(record.id));
-          }}
-          okText="Yes"
-          cancelText="No"
-        >
-          <a>
-            <DeleteOutlined />
-          </a>
-        </Popconfirm>,
-      ],
+      render: (_, record) => {
+        return record.user_id ? "" : [
+          <a
+            key="edit"
+            onClick={() => {
+              setCurrentRow(record);
+              handleWorkerEditModalVisible(true);
+            }}
+          >
+            <EditOutlined/>
+          </a>,
+          <Popconfirm
+            key="deleteWorkerConfirm"
+            title="Delete this worker?"
+            onConfirm={(e) => {
+              setCurrentRow(record);
+              deleteConfirm(Number(record.id));
+            }}
+            okText="Yes"
+            cancelText="No"
+          >
+            <a>
+              <DeleteOutlined/>
+            </a>
+          </Popconfirm>,
+        ]
+      }
     },
   ];
 
@@ -97,25 +105,19 @@ const WorkerList: React.FC = () => {
             <PlusOutlined /> New
           </Button>,
         ]}
-        columnsState={{
-          defaultValue: { // 配置初始值；如果配置了持久化，仅第一次生效（没有缓存的第一次），后续都按缓存处理。
-            id: {
-              show: false,
-            },
-            address: {
-              show: false,
-            },
-            issue_date: {
-              show: false,
-            },
-          },
-        }}
+        // columnsState={{
+        //   defaultValue: { // 配置初始值；如果配置了持久化，仅第一次生效（没有缓存的第一次），后续都按缓存处理。
+        //     id: {
+        //       show: false,
+        //     },
+        //   },
+        // }}
         request={queryWorkers}
         columns={workerListColumns}
       />
 
       <ModalForm
-        title="Worker"
+        title={"Worker: " + ((currentRow && currentRow.name) ? currentRow.name : "New")}
         autoFocusFirstInput
         modalProps={{
           destroyOnClose: true,
@@ -128,11 +130,21 @@ const WorkerList: React.FC = () => {
         }}
         open={workerEditModalVisible}
         onOpenChange={handleWorkerEditModalVisible}
-        onFinish={async(values) => {
-
-          handleWorkerEditModalVisible(false);
+        onFinish={async (values?: WorkerData) => {
+          if(values) {
+            const success = await updateWorker(values)
+            if (success && listRef.current) {
+              handleWorkerEditModalVisible(false);
+              listRef.current.reload();
+            }
+          }
         }}
       >
+        <ProFormText
+          name="id"
+          hidden={!debug}
+          initialValue={(currentRow && currentRow.id) ? currentRow.id : ""}
+        />
         <Row gutter={16}>
           <Col lg={12} md={12} sm={24}>
             <ProFormText
@@ -140,15 +152,17 @@ const WorkerList: React.FC = () => {
               label="Name"
               rules={[{required: true, message: 'Please input worker name'}]}
               placeholder="Worker Name"
+              initialValue={(currentRow && currentRow.name) ? currentRow.name : ""}
             />
           </Col>
           <Col lg={12} md={12} sm={24}>
             <ProFormText
               name="phone"
               label="Phone"
-              rules={[{required: false, message: 'Please input phone number'},
+              rules={[{required: true, message: 'Please input phone number'},
                 {pattern: /^(0[1-9])\d{8}$/, message: 'Please input correct phone number'}]}
               placeholder="Phone Number"
+              initialValue={(currentRow && currentRow.phone) ? currentRow.phone : ""}
             />
           </Col>
           <Col lg={12} md={12} sm={24}>
@@ -156,13 +170,16 @@ const WorkerList: React.FC = () => {
               name="company"
               label="Company"
               placeholder="Company Name"
+              initialValue={(currentRow && currentRow.company) ? currentRow.company : ""}
             />
           </Col>
           <Col lg={12} md={12} sm={24}>
             <ProFormText
               name="email"
               label="Email"
+              rules={[{required: false, type: "email", whitespace: false, message: 'Please input client email'}]}
               placeholder="Email"
+              initialValue={(currentRow && currentRow.email) ? currentRow.email : ""}
             />
           </Col>
         </Row>

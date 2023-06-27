@@ -1,6 +1,6 @@
 import type React from "react";
 
-type PaginationData = {
+export type PaginationData = {
   total: number;
   pageSize: number;
   current: number;
@@ -40,15 +40,16 @@ export type ClientData = {
   update_time?: Date;
 }
 
-type WorkerData = {
+export type WorkerData = {
   id: React.Key;
+  user_id?: number;
   name: string;
   phone?: string;
   email?: string;
   company?: string;
 }
 
-type ContactData = {
+export type ContactData = {
   id: React.Key;
   role?: number;
   name?: string;
@@ -56,7 +57,7 @@ type ContactData = {
   email?: string;
 }
 
-type InspectionData = {
+export type InspectionData = {
   inspection_id: React.Key;
   project_id: number;
   inspection_need: boolean;
@@ -65,7 +66,7 @@ type InspectionData = {
   inspection_report: string;
 }
 
-type InspectorData = {
+export type InspectorData = {
   id: React.Key;
   inspection?: InspectionData;
   worker?: WorkerData;

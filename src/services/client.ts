@@ -34,3 +34,29 @@ export async function queryClients (
     ...(options || {}),
   });
 }
+
+export async function updateClient(values: Record<string, any>) {
+  return request('/action/client/addOrUpdate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: values,
+  });
+}
+
+export async function deleteClient (
+  params: {
+    id: number;
+  },
+) {
+  return request('/action/client/delete', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params:{
+      ...params,
+    },
+  });
+}

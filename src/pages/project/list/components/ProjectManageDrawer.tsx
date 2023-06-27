@@ -123,7 +123,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
         >
           <StepsForm.StepForm<ProjectData>
             formRef={requirementStepFormRef}
-            title="Requirement"
+            title="Request"
             autoFocusFirstInput
             onFinish={async (values?: ProjectData) => {
               if(values) {

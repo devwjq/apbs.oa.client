@@ -258,7 +258,7 @@ const RequirementStepForm: React.FC<FormProps> = (props) => {
           </Col>
         </Row>
       </Card>
-      <Card title="Project Detail" className={styles.card} bordered={true} style={{marginTop: 20}}>
+      <Card title="Requirement" className={styles.card} bordered={true} style={{marginTop: 20}}>
         <ProFormText
           name="id"
           hidden={!debug}

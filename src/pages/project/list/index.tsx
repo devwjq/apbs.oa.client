@@ -28,12 +28,17 @@ const ProjectList: React.FC = () => {
     {
       title: 'ID',
       dataIndex: 'id',
-      hideInSearch:true,
+      hideInSearch:false,
       sorter: true,
+      fixed: 'left',
+      width: 60,
+      align: 'right',
     },
     {
       title: 'Name',
       dataIndex: 'name',
+      fixed: 'left',
+      width: 200,
     },
     {
       title: 'Client',
@@ -79,6 +84,8 @@ const ProjectList: React.FC = () => {
     {
       title: 'Action',
       valueType: 'option',
+      fixed: 'right',
+      width: 60,
       render: (_, record) => [
         <a
           key="manage"
@@ -122,8 +129,12 @@ const ProjectList: React.FC = () => {
         headerTitle="List"
         actionRef={listRef}
         rowKey="id"
+        // scroll={{ x: 980 }}
         search={{
           labelWidth: "auto",
+        }}
+        pagination={{
+          showSizeChanger: true,
         }}
         toolBarRender={() => [
           <Button
@@ -140,20 +151,17 @@ const ProjectList: React.FC = () => {
         ]}
         columnsState={{
           defaultValue: { // 配置初始值；如果配置了持久化，仅第一次生效（没有缓存的第一次），后续都按缓存处理。
-            id: {
-              show: false,
-            },
-            address: {
-              show: false,
-            },
-            issue_date: {
-              show: false,
-            },
+            // id: {
+            //   show: false,
+            // },
+            // address: {
+            //   show: false,
+            // },
+            // issue_date: {
+            //   show: false,
+            // },
           },
         }}
-        // scroll={{
-        //   x: 980,
-        // }}
         request={queryProjects}
         columns={projectListColumns}
       />

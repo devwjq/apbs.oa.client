@@ -10,6 +10,7 @@ import InspectionStepForm from "@/pages/project/list/components/InspectionStepFo
 import {LeftOutlined, RightOutlined} from "@ant-design/icons";
 import {getProject, updateProject} from "@/services/project";
 import {getInspection, updateInspection} from "@/services/inspection";
+import {InspectorData} from "@/services/data";
 
 type FormProps = {
   projectData?: ProjectData;
@@ -27,6 +28,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
   // const [requirementStepFormClientDisable, setRequirementStepFormClientDisable] = useState<boolean>(false);
   const InspectionStepFormRef = useRef<ProFormInstance>();
   const [inspectionStepFormDisable, setInspectionStepFormDisable] = useState<boolean>(false);
+  const [inspectorDataSource, setInspectorDataSource] = useState<InspectorData[]>([]);
 
   if(props.visible && !init) {
     if(props.projectData && props.projectData.id && props.projectData.progress) {
@@ -158,7 +160,8 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
             autoFocusFirstInput
             onFinish={async (values?: InspectionData) => {
               if(values) {
-                const success = await updateInspection(values);
+                const formData = { ...values, inspectors: inspectorDataSource };
+                const success = await updateInspection(formData);
                 return success;
               }
             }}
@@ -180,6 +183,8 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               formRef = {InspectionStepFormRef}
               inspectionDisable = {inspectionStepFormDisable}
               setInspectionDisable = {setInspectionStepFormDisable}
+              inspectorDataSource = {inspectorDataSource}
+              setInspectorDataSource = {setInspectorDataSource}
             />
           </StepsForm.StepForm>
 

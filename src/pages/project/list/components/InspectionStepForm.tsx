@@ -1,8 +1,8 @@
 import type {Dispatch, MutableRefObject, SetStateAction} from "react";
-import React, { useState} from "react";
+import React, {useState} from "react";
 import styles from "@/pages/project/list/style.less";
 import {Button, Card, Col, Row} from "antd";
-import type { ProColumns} from "@ant-design/pro-table";
+import type {ProColumns} from "@ant-design/pro-table";
 import ProTable, {EditableProTable} from "@ant-design/pro-table";
 import {ProForm, ModalForm, ProFormDateTimeRangePicker, ProFormSwitch, ProFormText, ProFormTextArea} from "@ant-design/pro-form";
 import {EditOutlined, PlusOutlined} from "@ant-design/icons";
@@ -18,11 +18,13 @@ type FormProps = {
   formRef: MutableRefObject<any>;
   inspectionDisable: boolean;
   setInspectionDisable: Dispatch<SetStateAction<boolean>>;
+  inspectorDataSource: InspectorData[];
+  setInspectorDataSource: Dispatch<SetStateAction<InspectorData[]>>;
 };
 
 const InspectionStepForm: React.FC<FormProps> = (props) => {
-  // const [inspectionDisable, setInspectionDisable] = useState<boolean>(false);
   const [inspectorChooseModelVisible, handleInspectorChooseModelVisible] = useState<boolean>(false);
+  const [chosenInspectors, setChosenInspectors] = useState<InspectorData[]>();
 
   const workerListColumns: ProColumns<WorkerData>[] = [
     {
@@ -51,6 +53,11 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
 
   const inspectorListColumns: ProColumns<InspectorData>[] = [
     {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+    },
+    {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
@@ -72,7 +79,7 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
       render: (_, record: ContactData, index, action) => {
         return [
           <a
-            key="inspectorEdit"
+            key="inspectorDelete"
             onClick={() => {
               action?.startEditable(record.id);
             }}
@@ -83,6 +90,8 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
       },
     },
   ];
+
+  // let inspectorDataSource: InspectorData[] = [{id: -1, name: "test", phone: "0400000000"}];
 
   const accessContactListColumns: ProColumns<ContactData>[] = [
     {
@@ -190,15 +199,21 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
           </Col>
 
           <Col span={24} hidden={props.inspectionDisable}>
+            <ProFormText
+              name="inspectors"
+              hidden={!debug}
+              initialValue={props.inspectorDataSource}
+            />
             <ProTable<InspectorData>
               headerTitle="Inspectors"
-              name="inspectors"
+              name="inspector_list"
               rowKey="id"
               search={false}
+              pagination={false}
               toolBarRender={() => [
                 <Button
                   type="primary"
-                  key="projectAddButton"
+                  key="inspectorAddButton"
                   onClick={() => {
                     handleInspectorChooseModelVisible(true);
                   }}
@@ -206,40 +221,20 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
                   <PlusOutlined /> Add
                 </Button>,
               ]}
-              // recordCreatorProps={{
-              //   record: () => {
-              //     return {
-              //       id: `-${Date.now()}`,
-              //     };
-              //   },
-              //   creatorButtonText: 'Add Inspector',
-              // }}
               columns={inspectorListColumns}
-              // value={contactData}
-              // onChange={setContactData}
+              dataSource={props.inspectorDataSource}
               request = {
                 async () => {
-                  if(props.projectId) {
+                  if((!props.inspectorDataSource || props.inspectorDataSource.length === 0) && props.projectId) {
                     return await getInspectors({id: props.projectId});
                   }
-                  const nullContacts = {} as InspectorData
-                  return nullContacts;
+                  return {success: false};
                 }
               }
-              // editable={{
-              //   type: 'multiple',
-              //   form: contactEditableForm,
-              //   actionRender: (row, config, defaultDoms) => {
-              //     return [defaultDoms.save, defaultDoms.delete, defaultDoms.cancel];
-              //   },
-              //   // onCancel: async (key, row, originRow, newLinew) => {
-              //   //   contactEditableForm.resetFields([key]);
-              //   // },
-              // }}
             />
           </Col>
 
-          <Col span={24} hidden={props.inspectionDisable}>
+          <Col span={24} hidden={props.inspectionDisable} style={{marginTop: 20}}>
             <EditableProTable<ContactData>
               headerTitle="Access Contacts"
               name="inspection_contacts"
@@ -263,8 +258,7 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
                   if(props.projectId) {
                     return await getInspectionContacts({id: props.projectId});
                   }
-                  const nullContacts = {} as ContactData
-                  return nullContacts;
+                  return {success: false};
                 }
               }
               // editable={{
@@ -323,7 +317,41 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
         open={inspectorChooseModelVisible}
         onOpenChange={handleInspectorChooseModelVisible}
         onFinish={async(values) => {
+          if(chosenInspectors && chosenInspectors.length > 0) {
+            let inspectorData = JSON.parse(JSON.stringify(props.inspectorDataSource));  //深度copy数组
+            // for (let i = 0; i < chosenInspectors.length; i++) {
+            //   inspectorData[inspectorDataSource.length + i] = {
+            //     id: chosenInspectors[i].id,
+            //     name: chosenInspectors[i].name,
+            //     phone: chosenInspectors[i].phone,
+            //     email: chosenInspectors[i].email,
+            //     company: chosenInspectors[i].company,
+            //   }
+            // }
+            let i = 0;
+            chosenInspectors.forEach(function (chosenInspector) {
+              let isExist = false;
+              props.inspectorDataSource.forEach(function (dsInspector) {
+                if(dsInspector.id === chosenInspector.id) {
+                  isExist = true;
+                }
+              })
+
+              if(!isExist) {
+                inspectorData[props.inspectorDataSource.length + i] = {
+                  id: chosenInspector.id,
+                  name: chosenInspector.name,
+                  phone: chosenInspector.phone,
+                  email: chosenInspector.email,
+                  company: chosenInspector.company,
+                }
+                i++;
+              }
+            });
+            props.setInspectorDataSource(inspectorData);
+          }
           handleInspectorChooseModelVisible(false);
+          // inspectorTableActionRef.current?.reload();
         }}
       >
         <Row gutter={16}>
@@ -339,7 +367,7 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
               rowSelection={{
                 // type: "radio",
                 onChange: (_, selectedRows) => {
-                  // setChosenClient(selectedRows[0]);
+                  setChosenInspectors(selectedRows);
                 },
               }}
               request={queryWorkers}

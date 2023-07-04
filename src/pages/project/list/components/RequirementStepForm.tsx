@@ -421,7 +421,7 @@ const RequirementStepForm: React.FC<FormProps> = (props) => {
           if(chosenClient) {
             props.formRef.current?.setFieldValue(['client', 'id'], chosenClient.id);
             props.formRef.current?.setFieldValue(['client', 'name'], chosenClient.name);
-            props.formRef.current?.setFieldValue(['client', 'type'], chosenClient.client_type_id);
+            props.formRef.current?.setFieldValue(['client', 'client_type_id'], chosenClient.client_type_id);
             props.formRef.current?.setFieldValue(['client', 'phone'], chosenClient.phone);
             props.formRef.current?.setFieldValue(['client', 'email'], chosenClient.email);
             props.formRef.current?.setFieldValue(['client', 'company'], chosenClient.company);

@@ -113,6 +113,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                   setStep(0);
                   setInspectionStepFormDisable(false);
                   // setRequirementStepFormClientDisable(false);
+                  setInspectorDataSource([]);
                   props.projectListRef.current.reload();
                   props.onVisibleChange(false);
                 }}

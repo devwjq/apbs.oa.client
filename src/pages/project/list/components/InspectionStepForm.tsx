@@ -1,17 +1,17 @@
 import type {Dispatch, MutableRefObject, SetStateAction} from "react";
 import React, {useState} from "react";
 import styles from "@/pages/project/list/style.less";
-import {Button, Card, Col, Row} from "antd";
+import {Button, Card, Col, Popconfirm, Row} from "antd";
 import type {ProColumns} from "@ant-design/pro-table";
 import ProTable, {EditableProTable} from "@ant-design/pro-table";
 import {ProForm, ModalForm, ProFormDateTimeRangePicker, ProFormSwitch, ProFormText, ProFormTextArea} from "@ant-design/pro-form";
-import {EditOutlined, PlusOutlined} from "@ant-design/icons";
-import ReactQuill from "react-quill";
+import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import 'react-quill/dist/quill.snow.css';
 import {WorkerData, ContactData, InspectorData, PaginationData} from "@/services/data";
 import {getInspectionContacts, getInspectors} from "@/services/inspection";
 import {queryWorkers} from "@/services/worker";
 import {debug} from "@/pages/Env";
+import RTEditor from "@/pages/components/RTEditor";
 
 type FormProps = {
   projectId?: number;
@@ -78,14 +78,33 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
       valueType: 'option',
       render: (_, record: ContactData, index, action) => {
         return [
-          <a
-            key="inspectorDelete"
-            onClick={() => {
-              action?.startEditable(record.id);
+          <Popconfirm
+            key="inspectorDeleteConfirm"
+            title="Delete this inspector?"
+            onConfirm={(e)=>{
+              let inspectorData = [] as InspectorData[];
+              let i = 0;
+              props.inspectorDataSource.forEach(function (inspector) {
+                if(inspector.id !== Number(record.id)) {
+                  inspectorData[i] = {
+                    id: inspector.id,
+                    name: inspector.name,
+                    phone: inspector.phone,
+                    email: inspector.email,
+                    company: inspector.company,
+                  }
+                  i++;
+                }
+              });
+              props.setInspectorDataSource(inspectorData);
             }}
+            okText="Yes"
+            cancelText="No"
           >
-            <EditOutlined />
-          </a>,
+            <a>
+              <DeleteOutlined />
+            </a>
+          </Popconfirm>,
         ];
       },
     },
@@ -226,9 +245,10 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
               request = {
                 async () => {
                   if((!props.inspectorDataSource || props.inspectorDataSource.length === 0) && props.projectId) {
-                    return await getInspectors({id: props.projectId});
+                    const serverData = await getInspectors({id: props.projectId});
+                    props.setInspectorDataSource(serverData.data);
                   }
-                  return {success: false};
+                  return {success: true};
                 }
               }
             />
@@ -261,16 +281,17 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
                   return {success: false};
                 }
               }
-              // editable={{
-              //   type: 'multiple',
+              editable={{
+                type: 'multiple',
               //   form: contactEditableForm,
-              //   actionRender: (row, config, defaultDoms) => {
-              //     return [defaultDoms.save, defaultDoms.delete, defaultDoms.cancel];
-              //   },
+                actionRender: (row, config, defaultDoms) => {
+                  // return [defaultDoms.save, defaultDoms.delete, defaultDoms.cancel];
+                  return [defaultDoms.delete];
+                },
               //   // onCancel: async (key, row, originRow, newLinew) => {
               //   //   contactEditableForm.resetFields([key]);
               //   // },
-              // }}
+              }}
             />
           </Col>
         </Row>
@@ -281,22 +302,32 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
           <Col span={24}>
             <ProForm.Item
               name="inspection_report">
-              <ReactQuill
-                theme="snow"
-                style={{
-                  height: "500px",
-                }}
-                modules={{
-                  toolbar: [
-                    [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
-                    [{size: []}],
-                    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                    [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
-                    ['link', 'image', 'video'],
-                    ['clean']
-                  ]
-                }}
-              />
+              {/*<ReactQuill*/}
+              {/*  theme="snow"*/}
+              {/*  style={{*/}
+              {/*    height: "500px",*/}
+              {/*  }}*/}
+              {/*  modules={{*/}
+              {/*    toolbar: {*/}
+              {/*      container: [*/}
+              {/*        [{'font': []}],*/}
+              {/*        [{'header': ['1', '2', false]}],*/}
+              {/*        [{size: []}],*/}
+              {/*        [{'color': []}, {'background': []}],*/}
+              {/*        ['bold', 'italic', 'underline', 'strike', 'blockquote'],*/}
+              {/*        [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],*/}
+              {/*        [{ script: 'sub' }, { script: 'super' }], // 上下标*/}
+              {/*        [{'align': []}],*/}
+              {/*        ['image', 'video', 'link'],*/}
+              {/*        ['clean']*/}
+              {/*      ],*/}
+              {/*      handlers: {*/}
+              {/*        // image: uploadImage*/}
+              {/*      }*/}
+              {/*    }*/}
+              {/*  }}*/}
+              {/*/>*/}
+              <RTEditor/>
             </ProForm.Item>
           </Col>
         </Row>
@@ -319,15 +350,6 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
         onFinish={async(values) => {
           if(chosenInspectors && chosenInspectors.length > 0) {
             let inspectorData = JSON.parse(JSON.stringify(props.inspectorDataSource));  //深度copy数组
-            // for (let i = 0; i < chosenInspectors.length; i++) {
-            //   inspectorData[inspectorDataSource.length + i] = {
-            //     id: chosenInspectors[i].id,
-            //     name: chosenInspectors[i].name,
-            //     phone: chosenInspectors[i].phone,
-            //     email: chosenInspectors[i].email,
-            //     company: chosenInspectors[i].company,
-            //   }
-            // }
             let i = 0;
             chosenInspectors.forEach(function (chosenInspector) {
               let isExist = false;
@@ -351,7 +373,6 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
             props.setInspectorDataSource(inspectorData);
           }
           handleInspectorChooseModelVisible(false);
-          // inspectorTableActionRef.current?.reload();
         }}
       >
         <Row gutter={16}>

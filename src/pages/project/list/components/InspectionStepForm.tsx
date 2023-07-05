@@ -11,7 +11,9 @@ import {WorkerData, ContactData, InspectorData, PaginationData} from "@/services
 import {getInspectionContacts, getInspectors} from "@/services/inspection";
 import {queryWorkers} from "@/services/worker";
 import {debug} from "@/pages/Env";
-import RTEditor from "@/pages/components/RTEditor";
+import ReactQuillEditor from "@/pages/components/ReactQuillEditor";
+import ReactQuillWithTableEditor from "@/pages/components/ReactQuillWithTableEditor";
+import TestEditor from "@/pages/components/TestEditor";
 
 type FormProps = {
   projectId?: number;
@@ -327,7 +329,8 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
               {/*    }*/}
               {/*  }}*/}
               {/*/>*/}
-              <RTEditor/>
+              {/*<ReactQuillEditor/>*/}
+              <ReactQuillWithTableEditor/>
             </ProForm.Item>
           </Col>
         </Row>

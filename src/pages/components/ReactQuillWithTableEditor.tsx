@@ -1,29 +1,58 @@
-import React, { useState, useRef, useMemo } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import React, {useState, useRef, useMemo, useEffect} from 'react';
 import {Button, message, Upload} from "antd";
+import ReactQuill, {Quill} from 'react-quill-with-table';
+import QuillBetterTable from "quill-better-table";
+import ImageResize from 'quill-image-resize-module-react';
+import 'react-quill-with-table/dist/quill.snow.css';
+import "quill-better-table/dist/quill-better-table.css";
 
 let uploadMessage: any = null;
 let uploadFileNumber = 0;
 
-const RTEditor: React.FC<any> = (props) => {
+const ReactQuillWithTableEditor: React.FC<any> = (props) => {
   let editorRef: any = useRef(null);
   let uploadRef: any = useRef(null);
   const [reportEditorDisabled, setReportEditorDisabled] = useState(false);
+
+  Quill.register('modules/imageResize', ImageResize);
+  Quill.register({'modules/better-table': QuillBetterTable}, true);
+  // window.katex = katex;
+
+  const insertTable = () => {
+    const editor = editorRef.current.getEditor();
+    const tableModule = editor.getModule("better-table");
+    tableModule.insertTable(3, 3);
+  };
+
+  useEffect(() => {
+    const editor = editorRef.current.getEditor();
+    const toolbar = editor.getModule("toolbar");
+    toolbar.addHandler("table", () => {
+      insertTable();
+    });
+  }, []);
 
   const modules: any = useMemo( // useMemo: 解决自定义失焦问题
     () => ({
       toolbar: {
         container: [
-          [{'font': []}],
-          [{'header': [1, 2, false]}],
-          [{'size': []}],
-          [{'color': []}, {'background': []}],
-          ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-          [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
-          [{'script': 'sub' }, {'script': 'super' }], // 上下标
-          // [{'align': []}],
+          [
+            {'font': []},
+            {'header': [1, 2, false]},
+            {'size': []}
+          ],
+          [
+            'bold', 'italic', 'underline', 'strike', 'blockquote',
+            {'script': 'sub' }, {'script': 'super' },
+            {'color': []}, {'background': []}
+          ],
+          [
+            {'list': 'ordered'}, {'list': 'bullet'},
+            {'indent': '-1'}, {'indent': '+1'},
+            {'align': []}
+          ],
           ['link', 'image', /**'video'**/],
+          ['table'],
           ['clean'],
         ],
         handlers: {
@@ -32,6 +61,23 @@ const RTEditor: React.FC<any> = (props) => {
           },
         },
       },
+      imageResize: {
+        parchment: Quill.import('parchment'),
+        modules: ['Resize', 'DisplaySize']
+      },
+      table: false,
+      "better-table": {
+        operationMenu: {
+          items: {
+            unmergeCells: {
+              text: "Another unmerge cells name"
+            }
+          }
+        }
+      },
+      keyboard: {
+        bindings: QuillBetterTable.keyboardBindings
+      },
     }),
     [],
   );
@@ -39,19 +85,15 @@ const RTEditor: React.FC<any> = (props) => {
   const options: any = {
     placeholder: '',
     theme: 'snow',
-    readOnly: false, // 是否只读
-    className: 'ql-editor', //组件要加上(className=“ql-editor”)样式类名,否则空格不回显
+    // className: 'ql-editor', //组件要加上(className=“ql-editor”)样式类名,否则空格不回显
     modules: modules,
     ref: editorRef,
-    style: {
-      width: '100%',
-      height: '500px',
-      overflow: 'hidden',
-      borderBottom: '1px solid #ccc',
-    },
-    onFocus: {
-
-    }
+    // style: {
+    //   width: '100%',
+    //   height: '500px',
+    //   overflow: 'hidden',
+    //   borderBottom: '1px solid #ccc',
+    // }
   };
 
   return (
@@ -112,4 +154,4 @@ const RTEditor: React.FC<any> = (props) => {
   );
 };
 
-export default RTEditor;
+export default ReactQuillWithTableEditor;

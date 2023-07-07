@@ -4,16 +4,13 @@ import styles from "@/pages/project/list/style.less";
 import {Button, Card, Col, Popconfirm, Row} from "antd";
 import type {ProColumns} from "@ant-design/pro-table";
 import ProTable, {EditableProTable} from "@ant-design/pro-table";
-import {ProForm, ModalForm, ProFormDateTimeRangePicker, ProFormSwitch, ProFormText, ProFormTextArea} from "@ant-design/pro-form";
+import {ModalForm, ProFormDateTimeRangePicker, ProFormSwitch, ProFormText, ProFormTextArea} from "@ant-design/pro-form";
 import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
-import 'react-quill/dist/quill.snow.css';
 import {WorkerData, ContactData, InspectorData, PaginationData} from "@/services/data";
 import {getInspectionContacts, getInspectors} from "@/services/inspection";
 import {queryWorkers} from "@/services/worker";
 import {debug} from "@/pages/Env";
-import ReactQuillEditor from "@/pages/components/ReactQuillEditor";
-import ReactQuillWithTableEditor from "@/pages/components/ReactQuillWithTableEditor";
-import TestEditor from "@/pages/components/TestEditor";
+import ReactQuillEditor from "@/components/ReactQuillEditor";
 
 type FormProps = {
   projectId?: number;
@@ -302,36 +299,8 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
             hidden={props.inspectionDisable}>
         <Row gutter={16}>
           <Col span={24}>
-            <ProForm.Item
-              name="inspection_report">
-              {/*<ReactQuill*/}
-              {/*  theme="snow"*/}
-              {/*  style={{*/}
-              {/*    height: "500px",*/}
-              {/*  }}*/}
-              {/*  modules={{*/}
-              {/*    toolbar: {*/}
-              {/*      container: [*/}
-              {/*        [{'font': []}],*/}
-              {/*        [{'header': ['1', '2', false]}],*/}
-              {/*        [{size: []}],*/}
-              {/*        [{'color': []}, {'background': []}],*/}
-              {/*        ['bold', 'italic', 'underline', 'strike', 'blockquote'],*/}
-              {/*        [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],*/}
-              {/*        [{ script: 'sub' }, { script: 'super' }], // 上下标*/}
-              {/*        [{'align': []}],*/}
-              {/*        ['image', 'video', 'link'],*/}
-              {/*        ['clean']*/}
-              {/*      ],*/}
-              {/*      handlers: {*/}
-              {/*        // image: uploadImage*/}
-              {/*      }*/}
-              {/*    }*/}
-              {/*  }}*/}
-              {/*/>*/}
-              {/*<ReactQuillEditor/>*/}
-              <ReactQuillWithTableEditor/>
-            </ProForm.Item>
+            <ReactQuillEditor name="inspection_report"/>
+            {/*<ReactQuillWithTableEditor/>*/}
           </Col>
         </Row>
       </Card>

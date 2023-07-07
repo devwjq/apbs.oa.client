@@ -56,7 +56,6 @@
     "moment": "^2.29.4",
     "omit.js": "^2.0.2",
     "querystring": "^0.2.1",
-    "quill": "^2.0.0-dev.3",
     "quill-better-table": "^1.2.10",
     "quill-image-resize-module-react": "^3.0.0",
     "rc-menu": "^9.9.2",

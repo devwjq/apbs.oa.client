@@ -11,6 +11,7 @@ import {LeftOutlined, RightOutlined} from "@ant-design/icons";
 import {getProject, updateProject} from "@/services/project";
 import {getInspection, updateInspection} from "@/services/inspection";
 import {InspectorData} from "@/services/data";
+import QuotaStepForm from "@/pages/project/list/components/QuotaStepForm";
 
 type FormProps = {
   projectData?: ProjectData;
@@ -25,6 +26,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
   const [step, setStep] = useState(0);
   const projectStepsFormRef = useRef<ProFormInstance>();
   const requirementStepFormRef = useRef<ProFormInstance>();
+  const quotaStepFormRef = useRef<ProFormInstance>();
   // const [requirementStepFormClientDisable, setRequirementStepFormClientDisable] = useState<boolean>(false);
   const InspectionStepFormRef = useRef<ProFormInstance>();
   const [inspectionStepFormDisable, setInspectionStepFormDisable] = useState<boolean>(false);
@@ -196,7 +198,12 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               // setStep(values);
               // return true;
             }}
-           />
+           >
+            <QuotaStepForm
+              projectId = {Number(data?.id)}
+              formRef = {quotaStepFormRef}
+            />
+          </StepsForm.StepForm>
           <StepsForm.StepForm<ProjectData>
             title="Assignment"
             // initialValues={data}

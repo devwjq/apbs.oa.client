@@ -1,5 +1,6 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, {useState, useRef, useMemo} from 'react';
 import {Button, message, Upload} from "antd";
+import {ProForm} from "@ant-design/pro-form";
 import ReactQuill, {Quill} from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import ImageResize from 'quill-image-resize-module-react';
@@ -7,7 +8,11 @@ import ImageResize from 'quill-image-resize-module-react';
 let uploadMessage: any = null;
 let uploadFileNumber = 0;
 
-const ReactQuillEditor: React.FC<any> = (props) => {
+type Props = {
+  name?: string;
+};
+
+const ReactQuillEditor: React.FC<Props> = (props) => {
   let editorRef: any = useRef(null);
   let uploadRef: any = useRef(null);
   const [reportEditorDisabled, setReportEditorDisabled] = useState(false);
@@ -18,14 +23,21 @@ const ReactQuillEditor: React.FC<any> = (props) => {
     () => ({
       toolbar: {
         container: [
-          [{'font': []}],
-          [{'header': [1, 2, false]}],
-          [{'size': []}],
-          [{'color': []}, {'background': []}],
-          ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-          [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
-          [{'script': 'sub' }, {'script': 'super' }], // 上下标
-          [{'align': []}],
+          [
+            {'font': []},
+            {'header': [1, 2, false]},
+            {'size': []}
+          ],
+          [
+            'bold', 'italic', 'underline', 'strike', 'blockquote',
+            {'script': 'sub' }, {'script': 'super' },
+            {'color': []}, {'background': []}
+          ],
+          [
+            {'list': 'ordered'}, {'list': 'bullet'},
+            {'indent': '-1'}, {'indent': '+1'},
+            {'align': []}
+          ],
           ['link', 'image', /**'video'**/],
           ['clean'],
         ],
@@ -60,10 +72,12 @@ const ReactQuillEditor: React.FC<any> = (props) => {
 
   return (
     <div>
-      <ReactQuill
-        readOnly={reportEditorDisabled}
-        {...options}
-      />
+      <ProForm.Item name={props.name}>
+        <ReactQuill
+          readOnly={reportEditorDisabled}
+          {...options}
+        />
+      </ProForm.Item>
       <Upload
         name='file'//上传类型为file，若填image可能会报错
         multiple={true}

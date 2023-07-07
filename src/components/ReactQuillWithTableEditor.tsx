@@ -1,7 +1,7 @@
 import React, {useState, useRef, useMemo, useEffect} from 'react';
 import {Button, message, Upload} from "antd";
 import ReactQuill, {Quill} from 'react-quill-with-table';
-import QuillBetterTable from "quill-better-table";
+import QuillBetterTable from 'quill-better-table';
 import ImageResize from 'quill-image-resize-module-react';
 import 'react-quill-with-table/dist/quill.snow.css';
 import "quill-better-table/dist/quill-better-table.css";

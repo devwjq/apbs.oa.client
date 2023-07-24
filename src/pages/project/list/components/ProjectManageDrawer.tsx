@@ -9,9 +9,10 @@ import { LeftOutlined, RightOutlined, SaveOutlined } from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import { StepsForm } from '@ant-design/pro-form';
 import { RouteContext } from '@ant-design/pro-layout';
-import { Button, Drawer, message } from 'antd';
+import {Button, Drawer, Form, message, notification} from 'antd';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import React, { useRef, useState } from 'react';
+import {FormInstance} from "antd/lib";
 
 type FormProps = {
   projectData?: ProjectData;
@@ -21,17 +22,26 @@ type FormProps = {
 };
 
 const ProjectManageDrawer: React.FC<FormProps> = (props) => {
-  const [messageApi, contextHolder] = message.useMessage();
+  const [notificationApi, contextHolder] = notification.useNotification();
   const [init, setInit] = useState(false);
   const [data, setData] = useState<ProjectData>();
   const [step, setStep] = useState(0);
+
   const projectStepsFormRef = useRef<ProFormInstance>();
+
   const requirementStepFormRef = useRef<ProFormInstance>();
   // const [requirementStepFormClientDisable, setRequirementStepFormClientDisable] = useState<boolean>(false);
+
   const inspectionStepFormRef = useRef<ProFormInstance>();
-  const [inspectionStepFormDisable, setInspectionStepFormDisable] = useState<boolean>(false);
+  let inspectionStepForm: FormInstance;
   const [inspectorDataSource, setInspectorDataSource] = useState<InspectorData[]>([]);
+
   const quotaStepFormRef = useRef<ProFormInstance>();
+
+  const setInspectionStepForm = (form: FormInstance) => {
+    inspectionStepForm = form;
+  };
+
 
   if (props.visible && !init) {
     if (props.projectData && props.projectData.id && props.projectData.progress) {
@@ -88,36 +98,6 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                       </Button>
                     </div>
                   );
-                } else if (props.step === 1) {
-                  return (
-                    <div style={{ textAlign: 'right', marginRight: 25 }}>
-                      <Button key="pre" onClick={() => props.onPre?.()} style={{ marginRight: 10 }}>
-                        <LeftOutlined /> Previous
-                      </Button>
-                      <Button
-                        key="save"
-                        style={{ marginRight: 10 }}
-                        onClick={() => {
-                          props.onSubmit?.();
-                          messageApi.open({
-                            type: 'success',
-                            content: 'Saved!',
-                          });
-                        }}
-                      >
-                        <SaveOutlined /> Save
-                      </Button>
-                      <Button
-                        key="next"
-                        type="primary"
-                        onClick={() => {
-                          props.onSubmit?.();
-                        }}
-                      >
-                        Save & Next <RightOutlined />
-                      </Button>
-                    </div>
-                  );
                 } else if (props.step === 4) {
                   return (
                     <div style={{ textAlign: 'right', marginRight: 25 }}>
@@ -151,8 +131,6 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                     setInit(false);
                     setData(undefined);
                     setStep(0);
-                    setInspectionStepFormDisable(false);
-                    // setRequirementStepFormClientDisable(false);
                     setInspectorDataSource([]);
                     props.projectListRef.current.reload();
                     props.onVisibleChange(false);
@@ -200,6 +178,15 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               title="Inspection"
               autoFocusFirstInput
               onFinish={async (values?: InspectionData) => {
+                if(values && values.inspection_need && !values.inspection_report) {
+                  notificationApi.info({
+                    message: `Saved, awaiting the inspection report.`,
+                    description:
+                      'The inspection information has been saved, but the next step cannot be taken until the inspection report is completed.',
+                    placement: 'top',
+                    duration: 20,
+                  });
+                }
                 if (values) {
                   const formData = { ...values, inspectors: inspectorDataSource };
                   const success = await updateInspection(formData);
@@ -208,15 +195,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               }}
               request={async () => {
                 if (data?.id) {
-                  const serverResponse = await getInspection({ projectId: Number(data?.id) });
-                  if (
-                    serverResponse &&
-                    serverResponse.hasOwnProperty('inspection_need') &&
-                    !serverResponse.inspection_need
-                  ) {
-                    setInspectionStepFormDisable(true);
-                  }
-                  return serverResponse;
+                  return await getInspection({ projectId: Number(data?.id) });
                 }
                 const nullInspection = {} as InspectionData;
                 return nullInspection;
@@ -225,8 +204,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               <InspectionStepForm
                 projectId={Number(data?.id)}
                 formRef={inspectionStepFormRef}
-                inspectionDisable={inspectionStepFormDisable}
-                setInspectionDisable={setInspectionStepFormDisable}
+                setForm={setInspectionStepForm}
                 inspectorDataSource={inspectorDataSource}
                 setInspectorDataSource={setInspectorDataSource}
               />

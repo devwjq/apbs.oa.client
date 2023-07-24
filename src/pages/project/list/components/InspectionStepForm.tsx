@@ -14,15 +14,15 @@ import {
 } from '@ant-design/pro-form';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable, { EditableProTable } from '@ant-design/pro-table';
-import { Button, Card, Col, Popconfirm, Row } from 'antd';
+import {Button, Card, Col, Form, Popconfirm, Row} from 'antd';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import React, { useState } from 'react';
+import {FormInstance} from "antd/lib";
 
 type FormProps = {
   projectId?: number;
   formRef: MutableRefObject<any>;
-  inspectionDisable: boolean;
-  setInspectionDisable: Dispatch<SetStateAction<boolean>>;
+  setForm: Function;
   inspectorDataSource: InspectorData[];
   setInspectorDataSource: Dispatch<SetStateAction<InspectorData[]>>;
 };
@@ -30,6 +30,10 @@ type FormProps = {
 const InspectionStepForm: React.FC<FormProps> = (props) => {
   const [inspectorChooseModelVisible, handleInspectorChooseModelVisible] = useState<boolean>(false);
   const [chosenInspectors, setChosenInspectors] = useState<InspectorData[]>();
+
+  const form = Form.useFormInstance();
+  props.setForm(form);
+  const need = Form.useWatch('inspection_need', form);
 
   const workerListColumns: ProColumns<WorkerData>[] = [
     {
@@ -166,11 +170,6 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
     },
   ];
 
-  const onNeedInspectionChange = (checked: boolean) => {
-    // props.formRef.current?.setFieldValue("need_inspection", checked);
-    props.setInspectionDisable(!checked);
-  };
-
   return (
     <>
       <Card title="Arrangement" className={styles.card} bordered={true}>
@@ -191,128 +190,131 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
                 checkedChildren: 'Yes',
                 unCheckedChildren: 'No',
                 defaultChecked: true,
-                onChange: onNeedInspectionChange,
               }}
             />
           </Col>
-          <Col lg={12} md={12} sm={24}>
-            <ProFormDateTimeRangePicker
-              name="inspection_time"
-              label="Inspection Time"
-              fieldProps={{
-                format: 'YYYY-MM-DD HH:mm',
-              }}
-              disabled={props.inspectionDisable}
-              rules={[{ required: !props.inspectionDisable }]}
-            />
-          </Col>
-          <Col span={24}>
-            <ProFormTextArea
-              fieldProps={{ autoSize: { minRows: 3, maxRows: 5 } }}
-              label="Note"
-              name="inspection_note"
-              disabled={props.inspectionDisable}
-              rules={[{ required: false, message: 'Please input inspection note' }]}
-              placeholder="Please input inspection note"
-              initialValue="Test Note"
-            />
-          </Col>
-
-          <Col span={24} hidden={props.inspectionDisable}>
-            <ProFormText
-              name="inspectors"
-              hidden={!debug}
-              initialValue={props.inspectorDataSource}
-            />
-            <ProTable<InspectorData>
-              headerTitle="Inspectors"
-              name="inspector_list"
-              rowKey="id"
-              search={false}
-              pagination={false}
-              toolBarRender={() => [
-                <Button
-                  type="primary"
-                  key="inspectorAddButton"
-                  onClick={() => {
-                    handleInspectorChooseModelVisible(true);
+          {need ? (
+            <>
+              <Col lg={12} md={12} sm={24}>
+                <ProFormDateTimeRangePicker
+                  name="inspection_time"
+                  label="Inspection Time"
+                  fieldProps={{
+                    format: 'YYYY-MM-DD HH:mm',
                   }}
-                >
-                  <PlusOutlined /> Add
-                </Button>,
-              ]}
-              columns={inspectorListColumns}
-              dataSource={props.inspectorDataSource}
-              request={async () => {
-                if (
-                  (!props.inspectorDataSource || props.inspectorDataSource.length === 0) &&
-                  props.projectId
-                ) {
-                  const serverData = await getInspectors({ id: props.projectId });
-                  props.setInspectorDataSource(serverData.data);
-                }
-                return { success: true };
-              }}
-            />
-          </Col>
+                  rules={[{ required: true }]}
+                />
+              </Col>
+              <Col span={24}>
+                <ProFormTextArea
+                  fieldProps={{ autoSize: { minRows: 3, maxRows: 5 } }}
+                  label="Note"
+                  name="inspection_note"
+                  rules={[{ required: false, message: 'Please input inspection note' }]}
+                  placeholder="Please input inspection note"
+                  initialValue="Test Note"
+                />
+              </Col>
 
-          <Col span={24} hidden={props.inspectionDisable} style={{ marginTop: 20 }}>
-            <EditableProTable<ContactData>
-              headerTitle="Access Contacts"
-              name="inspection_contacts"
-              rowKey="id"
-              // scroll={{
-              //   x: 390,
-              // }}
-              recordCreatorProps={{
-                record: () => {
-                  return {
-                    id: `-${Date.now()}`,
-                  };
-                },
-                creatorButtonText: 'Add Contact',
-              }}
-              columns={accessContactListColumns}
-              // value={contactData}
-              // onChange={setContactData}
-              request={async () => {
-                if (props.projectId) {
-                  return await getInspectionContacts({ id: props.projectId });
-                }
-                return { success: false };
-              }}
-              editable={{
-                type: 'multiple',
-                //   form: contactEditableForm,
-                actionRender: (row, config, defaultDoms) => {
-                  // return [defaultDoms.save, defaultDoms.delete, defaultDoms.cancel];
-                  return [defaultDoms.delete];
-                },
-                //   // onCancel: async (key, row, originRow, newLinew) => {
-                //   //   contactEditableForm.resetFields([key]);
-                //   // },
-              }}
-            />
-          </Col>
+              <Col span={24}>
+                <ProFormText
+                  name="inspectors"
+                  hidden={!debug}
+                  initialValue={props.inspectorDataSource}
+                />
+                <ProTable<InspectorData>
+                  headerTitle="Inspectors"
+                  name="inspector_list"
+                  rowKey="id"
+                  search={false}
+                  pagination={false}
+                  toolBarRender={() => [
+                    <Button
+                      type="primary"
+                      key="inspectorAddButton"
+                      onClick={() => {
+                        handleInspectorChooseModelVisible(true);
+                      }}
+                    >
+                      <PlusOutlined /> Add
+                    </Button>,
+                  ]}
+                  columns={inspectorListColumns}
+                  dataSource={props.inspectorDataSource}
+                  request={async () => {
+                    if (
+                      (!props.inspectorDataSource || props.inspectorDataSource.length === 0) &&
+                      props.projectId
+                    ) {
+                      const serverData = await getInspectors({ id: props.projectId });
+                      props.setInspectorDataSource(serverData.data);
+                    }
+                    return { success: true };
+                  }}
+                />
+              </Col>
+
+              <Col span={24} style={{ marginTop: 20 }}>
+                <EditableProTable<ContactData>
+                  headerTitle="Access Contacts"
+                  name="inspection_contacts"
+                  rowKey="id"
+                  // scroll={{
+                  //   x: 390,
+                  // }}
+                  recordCreatorProps={{
+                    record: () => {
+                      return {
+                        id: `-${Date.now()}`,
+                      };
+                    },
+                    creatorButtonText: 'Add Contact',
+                  }}
+                  columns={accessContactListColumns}
+                  // value={contactData}
+                  // onChange={setContactData}
+                  request={async () => {
+                    if (props.projectId) {
+                      return await getInspectionContacts({ id: props.projectId });
+                    }
+                    return { success: false };
+                  }}
+                  editable={{
+                    type: 'multiple',
+                    //   form: contactEditableForm,
+                    actionRender: (row, config, defaultDoms) => {
+                      // return [defaultDoms.save, defaultDoms.delete, defaultDoms.cancel];
+                      return [defaultDoms.delete];
+                    },
+                    //   // onCancel: async (key, row, originRow, newLinew) => {
+                    //   //   contactEditableForm.resetFields([key]);
+                    //   // },
+                  }}
+                />
+              </Col>
+            </>
+          ) : null }
         </Row>
       </Card>
-      <Card
-        title="Report"
-        className={styles.card}
-        bordered={true}
-        style={{ marginTop: 20, paddingBottom: 40 }}
-        hidden={props.inspectionDisable}
-      >
-        <Row gutter={16}>
-          <Col span={24}>
-            <ReactQuillEditor
-              name="inspection_report"
-              rules={[{ required: false, message: 'Please input inspection report.' }]}
-            />
-            {/*<ReactQuillWithTableEditor/>*/}
-          </Col>
-        </Row>
-      </Card>
+
+      { need ? (
+        <Card
+          title="Report"
+          className={styles.card}
+          bordered={true}
+          style={{ marginTop: 20, paddingBottom: 40 }}
+        >
+          <Row gutter={16}>
+            <Col span={24}>
+              <ReactQuillEditor
+                name="inspection_report"
+                rules={[{ required: false, message: 'Please input inspection report.' }]}
+              />
+              {/*<ReactQuillWithTableEditor/>*/}
+            </Col>
+          </Row>
+        </Card>
+      ) : null }
 
       <ModalForm
         title="Choose Inspector"

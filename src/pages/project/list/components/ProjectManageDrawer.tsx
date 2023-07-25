@@ -28,21 +28,22 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
 
   const [notificationApi, contextHolder] = notification.useNotification();
 
-  const projectStepsFormRef = useRef<ProFormInstance>();
-
   const requirementStepFormRef = useRef<ProFormInstance>();
-  // const [requirementStepFormClientDisable, setRequirementStepFormClientDisable] = useState<boolean>(false);
 
-  const inspectionStepFormRef = useRef<ProFormInstance>();
-  let inspectionStepForm: FormInstance;
   const [inspectorDataSource, setInspectorDataSource] = useState<InspectorData[]>([]);
 
-  const quotaStepFormRef = useRef<ProFormInstance>();
-
-  const setInspectionStepForm = (form: FormInstance) => {
-    inspectionStepForm = form;
+  const stepForm: FormInstance[] = [];
+  const setStepForm = (step: number, form: FormInstance) => {
+    stepForm[step] = form;
   };
 
+  const filterHTMLTag = (html: string) => {
+    let text = html.replace(/<\/?[^>]*>/g, ''); //去除HTML Tag
+    text = text.replace(/[|]*\n/, '') //去除行尾空格
+    text = text.replace(/&nbsp;/ig, ''); //去掉npsp
+    text = text.replace(/\s+/g, ''); //去掉空格
+    return text;
+  }
 
   if (props.visible && !init) {
     if (props.projectData && props.projectData.id && props.projectData.progress) {
@@ -75,7 +76,6 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
       <RouteContext.Consumer>
         {({ isMobile }) => (
           <StepsForm
-            formRef={projectStepsFormRef}
             stepsProps={{
               labelPlacement: 'vertical',
               // direction: isMobile ? 'vertical' : 'horizontal',
@@ -174,18 +174,19 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               <RequirementStepForm
                 projectId={Number(data?.id)}
                 formRef={requirementStepFormRef}
-                // clientDisable = {requirementStepFormClientDisable}
-                // setClientDisable = {setRequirementStepFormClientDisable}
+                setStepForm={setStepForm}
               />
             </StepsForm.StepForm>
 
             <StepsForm.StepForm<InspectionData>
-              formRef={inspectionStepFormRef}
               title="Inspection"
               autoFocusFirstInput
               onFinish={async (values?: InspectionData) => {
-                console.log(values?.inspection_need);
-                if(values && (values.inspection_need == undefined || values.inspection_need) && !values.inspection_report) {
+                if(values && (!values.inspection_report || filterHTMLTag(values.inspection_report).length == 0)) {
+                  values.inspection_report = "";
+                }
+                if(values && (values.inspection_need == undefined || values.inspection_need)
+                  && (!values.inspection_report || values.inspection_report.length == 0)) {
                   notificationApi.info({
                     message: `Saved, awaiting the inspection report.`,
                     description:
@@ -210,8 +211,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
             >
               <InspectionStepForm
                 projectId={Number(data?.id)}
-                formRef={inspectionStepFormRef}
-                setForm={setInspectionStepForm}
+                setStepForm={setStepForm}
                 inspectorDataSource={inspectorDataSource}
                 setInspectorDataSource={setInspectorDataSource}
               />
@@ -225,7 +225,10 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                 // return true;
               }}
             >
-              <QuotaStepForm projectId={Number(data?.id)} formRef={quotaStepFormRef} />
+              <QuotaStepForm
+                projectId={Number(data?.id)}
+                setStepForm={setStepForm}
+              />
             </StepsForm.StepForm>
             <StepsForm.StepForm<ProjectData>
               title="Assignment"

@@ -1,16 +1,20 @@
 import { debug } from '@/pages/Env';
 import styles from '@/pages/project/list/style.less';
 import { ProFormDatePicker, ProFormText } from '@ant-design/pro-form';
-import { Card, Col, Row } from 'antd';
+import {Card, Col, Form, Row} from 'antd';
 import moment from 'moment';
 import React, { MutableRefObject } from 'react';
 
 type FormProps = {
   projectId?: number;
-  formRef: MutableRefObject<any>;
+  setStepForm: Function;
 };
 
 const QuotaStepForm: React.FC<FormProps> = (props) => {
+  const form = Form.useFormInstance();
+  props.setStepForm(2, form);
+  form.setFieldValue("project_id", props.projectId);
+
   return (
     <Card className={styles.card} bordered={true}>
       <ProFormText name="project_id" hidden={!debug} initialValue={props.projectId} />

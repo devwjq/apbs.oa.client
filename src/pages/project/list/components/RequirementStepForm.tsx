@@ -21,8 +21,7 @@ import {debug} from "@/pages/Env";
 type FormProps = {
   projectId?: number;
   formRef: MutableRefObject<any>;
-  // clientDisable: boolean;
-  // setClientDisable: Dispatch<SetStateAction<boolean>>;
+  setStepForm: Function;
 };
 
 const RequirementStepForm: React.FC<FormProps> = (props) => {
@@ -31,6 +30,9 @@ const RequirementStepForm: React.FC<FormProps> = (props) => {
   // const [clientDisable, setClientDisable] = useState<boolean>(false);
   const [clientChooseModelVisible, handleClientChooseModelVisible] = useState<boolean>(false);
   const [chosenClient, setChosenClient] = useState<ClientData>();
+
+  const form = Form.useFormInstance();
+  props.setStepForm(0, form);
 
   const clientListColumns: ProColumns<ClientData>[] = [
     {

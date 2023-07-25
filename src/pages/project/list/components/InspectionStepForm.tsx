@@ -20,8 +20,7 @@ import React, {useState} from 'react';
 
 type FormProps = {
   projectId?: number;
-  formRef: MutableRefObject<any>;
-  setForm: Function;
+  setStepForm: Function;
   inspectorDataSource: InspectorData[];
   setInspectorDataSource: Dispatch<SetStateAction<InspectorData[]>>;
 };
@@ -31,8 +30,7 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
   const [chosenInspectors, setChosenInspectors] = useState<InspectorData[]>();
 
   const form = Form.useFormInstance();
-  props.setForm(form);
-
+  props.setStepForm(1, form);
   form.setFieldValue("project_id", props.projectId);
 
   let need = Form.useWatch('inspection_need', form);

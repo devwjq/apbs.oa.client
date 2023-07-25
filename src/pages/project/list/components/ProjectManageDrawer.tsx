@@ -22,10 +22,11 @@ type FormProps = {
 };
 
 const ProjectManageDrawer: React.FC<FormProps> = (props) => {
-  const [notificationApi, contextHolder] = notification.useNotification();
   const [init, setInit] = useState(false);
   const [data, setData] = useState<ProjectData>();
   const [step, setStep] = useState(0);
+
+  const [notificationApi, contextHolder] = notification.useNotification();
 
   const projectStepsFormRef = useRef<ProFormInstance>();
 
@@ -150,9 +151,14 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                 if (values) {
                   // const isClientDisabled = requirementStepFormClientDisable;
                   // setRequirementStepFormClientDisable(false);
-                  const success = await updateProject(values);
+                  const response = await updateProject(values);
                   // setRequirementStepFormClientDisable(isClientDisabled);
-                  return success;
+                  if(response.result) {
+                    setData({
+                      id: response.id,
+                    });
+                  }
+                  return response.result;
                 }
               }}
               request={async () => {
@@ -178,7 +184,8 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               title="Inspection"
               autoFocusFirstInput
               onFinish={async (values?: InspectionData) => {
-                if(values && values.inspection_need && !values.inspection_report) {
+                console.log(values?.inspection_need);
+                if(values && (values.inspection_need == undefined || values.inspection_need) && !values.inspection_report) {
                   notificationApi.info({
                     message: `Saved, awaiting the inspection report.`,
                     description:

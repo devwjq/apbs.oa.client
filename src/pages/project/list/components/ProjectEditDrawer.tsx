@@ -189,8 +189,8 @@ const ProjectEditDrawer: React.FC<FormProps> = (props) => {
           if(values) {
             const isClientDisabled = clientDisable;
             setClientDisable(false);
-            const success = await updateProject(values);
-            if (success) {
+            const response = await updateProject(values);
+            if (response.result) {
               props.onVisibleChange(false);
               if (props.projectListRef.current) {
                 props.projectListRef.current.reload();

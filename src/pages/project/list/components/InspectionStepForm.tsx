@@ -16,8 +16,7 @@ import type { ProColumns } from '@ant-design/pro-table';
 import ProTable, { EditableProTable } from '@ant-design/pro-table';
 import {Button, Card, Col, Form, Popconfirm, Row} from 'antd';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
-import React, { useState } from 'react';
-import {FormInstance} from "antd/lib";
+import React, {useState} from 'react';
 
 type FormProps = {
   projectId?: number;
@@ -33,7 +32,13 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
 
   const form = Form.useFormInstance();
   props.setForm(form);
-  const need = Form.useWatch('inspection_need', form);
+
+  form.setFieldValue("project_id", props.projectId);
+
+  let need = Form.useWatch('inspection_need', form);
+  if(need == undefined) {
+    need = true;
+  }
 
   const workerListColumns: ProColumns<WorkerData>[] = [
     {

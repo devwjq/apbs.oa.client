@@ -1,6 +1,6 @@
 import ReactQuillEditor from '@/components/ReactQuillEditor';
 import { debug } from '@/pages/Env';
-import styles from '@/pages/project/list/style.less';
+import styles from '@/pages/oa/project/style.less';
 import { ContactData, InspectorData, PaginationData, WorkerData } from '@/services/data';
 import { getInspectionContacts, getInspectors } from '@/services/inspection';
 import { queryWorkers } from '@/services/worker';

@@ -1,4 +1,5 @@
 import type React from "react";
+import {Time} from "lightningcss";
 
 export type PaginationData = {
   total: number;
@@ -74,4 +75,11 @@ export type InspectorData = {
   company?: string;
   phone?: string;
   email?: string;
+}
+
+export type EmailData = {
+  id: React.Key;
+  title: string;
+  from: string;
+  time: Time;
 }

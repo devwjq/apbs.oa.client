@@ -1,5 +1,5 @@
 import { debug } from '@/pages/Env';
-import styles from '@/pages/project/list/style.less';
+import styles from '@/pages/oa/project/style.less';
 import { ProFormDatePicker, ProFormText } from '@ant-design/pro-form';
 import {Card, Col, Form, Row} from 'antd';
 import moment from 'moment';

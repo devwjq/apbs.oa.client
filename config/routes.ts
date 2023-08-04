@@ -12,29 +12,34 @@
  */
 export default [
   {
-    name: 'Business',
+    name: 'OA',
     icon: 'profile',
-    path: '/project',
+    path: '/oa',
     // hideChildrenInMenu: true,
     routes: [
       // {
-      //   path: '/project',
-      //   redirect: '/project/list',
+      //   path: '/oa',
+      //   redirect: '/oa/project',
       // },
       {
+        name: 'Email',
+        path: '/oa/email',
+        component: './oa/email',
+      },
+      {
         name: 'Project',
-        path: '/project/list',
-        component: './project/list',
+        path: '/oa/project',
+        component: './oa/project',
       },
       {
         name: 'Client',
-        path: '/project/client',
-        component: './project/client',
+        path: '/oa/client',
+        component: './oa/client',
       },
       {
         name: 'Worker',
-        path: '/project/worker',
-        component: './project/worker',
+        path: '/oa/worker',
+        component: './oa/worker',
       },
     ],
   },
@@ -80,7 +85,7 @@ export default [
   // },
   {
     path: '/',
-    redirect: '/project/list',
+    redirect: '/oa/project',
   },
   {
     path: '*',

@@ -29,12 +29,12 @@ export default {
   dev: {
     '/action/': {
       // 要代理的地址
-      target: 'http://oa.apbs.com.au',
+      target: 'https://oa.apbs.com.au',
       changeOrigin: true,
     },
     '/img/upload/': {
       // 要代理的地址
-      target: 'http://oa.apbs.com.au',
+      target: 'https://oa.apbs.com.au',
       changeOrigin: true,
     },
   },

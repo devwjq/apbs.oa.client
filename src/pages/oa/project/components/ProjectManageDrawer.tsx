@@ -1,6 +1,6 @@
-import InspectionStepForm from '@/pages/project/list/components/InspectionStepForm';
-import QuotaStepForm from '@/pages/project/list/components/QuotaStepForm';
-import RequirementStepForm from '@/pages/project/list/components/RequirementStepForm';
+import InspectionStepForm from '@/pages/oa/project/components/InspectionStepForm';
+import QuotaStepForm from '@/pages/oa/project/components/QuotaStepForm';
+import RequirementStepForm from '@/pages/oa/project/components/RequirementStepForm';
 import type { InspectionData, ProjectData } from '@/services/data';
 import { InspectorData } from '@/services/data';
 import { getInspection, updateInspection } from '@/services/inspection';

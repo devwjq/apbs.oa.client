@@ -115,7 +115,7 @@ const WorkerList: React.FC = () => {
         toolBarRender={() => [
           <Button
             type="primary"
-            key="workerAddButton"
+            key="clientAddButton"
             onClick={() => {
               setCurrentRow(undefined);
               handleClientEditModalVisible(true);

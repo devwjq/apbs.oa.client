@@ -1,42 +1,54 @@
-import {DeleteOutlined, EditOutlined, PlusOutlined} from '@ant-design/icons';
-import {Button, Col, Popconfirm, Row} from 'antd';
-import React, { useState, useRef } from 'react';
+import { EmailData, PaginationData } from '@/services/data';
+import { queryEmails } from '@/services/email';
+import { ScheduleOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProTable from "@ant-design/pro-table";
-import {PaginationData, ClientData, EmailData, ProjectData} from "@/services/data";
-import {ModalForm, ProFormSelect, ProFormText} from "@ant-design/pro-form";
-import {debug} from "@/pages/Env";
-import {queryEmails} from "@/services/email";
-import {getProject} from "@/services/project";
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
+import React, { useRef, useState } from 'react';
 
 const EmailList: React.FC = () => {
   const listRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<ClientData>();
+  const [currentRow, setCurrentRow] = useState<EmailData>();
 
   const emailListColumns: ProColumns<EmailData>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
       hideInSearch: true,
-      sorter: true,
-    },
-    {
-      title: 'Title',
-      dataIndex: 'title',
+      hideInTable: true,
     },
     {
       title: 'Sender',
       dataIndex: 'from',
+      ellipsis: true,
+      width: 200,
+      render: (_, record) => <b>{_}</b>,
     },
     {
-      title: 'Time',
-      dataIndex: 'time',
+      title: 'Subject',
+      dataIndex: 'subject',
+      render: (_, record) => (
+        <div>
+          <div>
+            <b>{_}</b>
+          </div>
+          <div>{record.snippet ? record.snippet : ''}</div>
+        </div>
+      ),
+    },
+    {
+      title: 'Date',
+      dataIndex: 'date',
       hideInSearch: true,
+      align: 'right',
+      width: 100,
+      render: (_, record) => <b>{_}</b>,
     },
     {
       title: 'Action',
       valueType: 'option',
+      align: 'center',
+      width: 60,
       render: (_, record) => [
         <a
           key="create"
@@ -45,9 +57,9 @@ const EmailList: React.FC = () => {
             // handleClientEditModalVisible(true);
           }}
         >
-          <PlusOutlined />
+          <ScheduleOutlined />
         </a>,
-      ]
+      ],
     },
   ];
 
@@ -58,12 +70,18 @@ const EmailList: React.FC = () => {
         actionRef={listRef}
         rowKey="id"
         search={{
-          labelWidth: "auto",
+          labelWidth: 'auto',
         }}
-        request={async () => {
-          const emails = await queryEmails({current: 0, pageSize: 20});
-          const nullProject = {} as ProjectData;
-          return nullProject;
+        pagination={false}
+        request={async (params, sort, filter) => {
+          console.log('request = ');
+          const response = await queryEmails(params);
+          if (response.oauthUrl) {
+            console.log('oauthUrl = ' + response.oauthUrl);
+            window.location.href = response.oauthUrl;
+          }
+
+          return response;
         }}
         columns={emailListColumns}
       />

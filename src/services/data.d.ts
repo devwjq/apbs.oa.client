@@ -1,5 +1,4 @@
-import type React from "react";
-import {Time} from "lightningcss";
+import type React from 'react';
 
 export type PaginationData = {
   total: number;
@@ -8,9 +7,9 @@ export type PaginationData = {
 };
 
 export type ProjectTypeData = {
-  id: React.Key
-  name: string
-}
+  id: React.Key;
+  name: string;
+};
 
 export type ProjectData = {
   id?: React.Key;
@@ -27,7 +26,7 @@ export type ProjectData = {
   status?: number;
   update_time?: Date;
   create_time?: Date;
-}
+};
 
 export type ClientData = {
   id: React.Key;
@@ -39,7 +38,7 @@ export type ClientData = {
   abn?: string;
   address?: string;
   update_time?: Date;
-}
+};
 
 export type WorkerData = {
   id: React.Key;
@@ -48,7 +47,7 @@ export type WorkerData = {
   phone?: string;
   email?: string;
   company?: string;
-}
+};
 
 export type ContactData = {
   id: React.Key;
@@ -56,7 +55,7 @@ export type ContactData = {
   name?: string;
   phone?: string;
   email?: string;
-}
+};
 
 export type InspectionData = {
   inspection_id: React.Key;
@@ -65,7 +64,7 @@ export type InspectionData = {
   inspection_time: [];
   inspection_note: string;
   inspection_report: string;
-}
+};
 
 export type InspectorData = {
   id: React.Key;
@@ -75,11 +74,12 @@ export type InspectorData = {
   company?: string;
   phone?: string;
   email?: string;
-}
+};
 
 export type EmailData = {
   id: React.Key;
-  title: string;
+  subject: string;
+  snippet: string;
   from: string;
-  time: Time;
-}
+  date: Date;
+};

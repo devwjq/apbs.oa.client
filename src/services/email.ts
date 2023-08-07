@@ -1,11 +1,10 @@
-import {request} from "@@/exports";
-import {ClientData, EmailData} from "@/services/data";
+import { EmailData } from '@/services/data';
+import { request } from '@@/exports';
 
-
-export async function queryEmails (
+export async function queryEmails(
   params: {
-    current?: number; /** 当前的页码 */
-    pageSize?: number;  /** 页面的容量 */
+    current?: number /** 当前的页码 */;
+    pageSize?: number /** 页面的容量 */;
   },
   options?: { [key: string]: any },
 ) {
@@ -14,6 +13,7 @@ export async function queryEmails (
     /** 列表的内容总数 */
     total?: number;
     success?: boolean;
+    oauthUrl?: string;
   }>('/action/google/email_query', {
     method: 'GET',
     headers: {

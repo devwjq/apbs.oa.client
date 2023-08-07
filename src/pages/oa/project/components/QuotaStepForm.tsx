@@ -27,11 +27,11 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
   form.setFieldValue("project_id", props.projectId);
 
   const emailAddonBefore = (
-    <Select defaultValue="Email"
+    <Select defaultValue="email"
             onChange={(value) => {
               if(value === "gmail") {
                 form.setFieldValue("email", "");
-                form.setFieldValue("gmail", "");
+                form.setFieldValue("gmail", "gmail");
                 form.setFieldValue("oldEmail", "");
                 // form.getFieldInstance("email").getFieldProps().setProperty("disabled" , "true");
                 handleGmailChooseModelVisible(true);

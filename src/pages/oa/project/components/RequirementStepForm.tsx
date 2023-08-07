@@ -185,6 +185,10 @@ const RequirementStepForm: React.FC<FormProps> = (props) => {
           hidden={!debug}
           // rules={[{required: true, message: 'Please choose a client'}]}
           placeholder="Please choose a client"
+          disabled={true}
+          fieldProps={{
+            addonBefore: "Client ID",
+          }}
         />
 
         <Row gutter={16}>

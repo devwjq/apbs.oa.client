@@ -176,8 +176,8 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
   return (
     <>
       <Card title="Arrangement" className={styles.card} bordered={true}>
-        <ProFormText name="inspection_id" hidden={!debug} />
-        <ProFormText name="project_id" hidden={!debug} initialValue={props.projectId} />
+        <ProFormText name="inspection_id" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Inspection ID"}}/>
+        <ProFormText name="project_id" hidden={!debug} initialValue={props.projectId} disabled={true} fieldProps={{addonBefore: "Project ID"}}/>
         {/*<ProFormText*/}
         {/*  name="need_inspection"*/}
         {/*  hidden={!debug}*/}

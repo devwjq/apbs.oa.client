@@ -117,9 +117,9 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
   return (
     <>
       <Card className={styles.card} bordered={true}>
-        <ProFormText name="project_id" hidden={!debug} initialValue={props.projectId} />
-        <ProFormText name="gmail" hidden={!debug} />
-        <ProFormText name="oldEmail" hidden={!debug} />
+        <ProFormText name="project_id" hidden={!debug} initialValue={props.projectId} disabled={true} fieldProps={{addonBefore: "Project ID"}}/>
+        <ProFormText name="gmail" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Gmail Thread"}}/>
+        <ProFormText name="oldEmail" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Old Email"}}/>
 
         <Row gutter={16}>
           <Col lg={6} md={12} sm={24}>

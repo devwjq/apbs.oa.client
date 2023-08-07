@@ -322,9 +322,9 @@ const InspectionStepForm: React.FC<FormProps> = (props) => {
       <ModalForm
         title="Choose Inspector"
         width="90%"
-        modalProps={{
-          destroyOnClose: true,
-        }}
+        // modalProps={{
+        //   destroyOnClose: true,
+        // }}
         submitter={{
           searchConfig: {
             submitText: 'Choose',

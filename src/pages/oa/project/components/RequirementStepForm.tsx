@@ -408,9 +408,9 @@ const RequirementStepForm: React.FC<FormProps> = (props) => {
       <ModalForm
         title="Choose Client"
         width="90%"
-        modalProps={{
-          destroyOnClose: true,
-        }}
+        // modalProps={{
+        //   destroyOnClose: true,
+        // }}
         submitter={{
           searchConfig: {
             submitText: 'Choose',

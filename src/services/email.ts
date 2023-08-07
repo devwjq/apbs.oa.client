@@ -1,7 +1,7 @@
 import { EmailData } from '@/services/data';
 import { request } from '@@/exports';
 
-export async function queryEmails(
+export async function queryGmails(
   params: {
     current?: number /** 当前的页码 */;
     pageSize?: number /** 页面的容量 */;
@@ -14,7 +14,7 @@ export async function queryEmails(
     total?: number;
     success?: boolean;
     oauthUrl?: string;
-  }>('/action/google/email_query', {
+  }>('/action/google/gmail_query', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

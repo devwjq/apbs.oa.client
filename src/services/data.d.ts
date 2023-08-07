@@ -81,5 +81,29 @@ export type EmailData = {
   subject: string;
   snippet: string;
   from: string;
+  email: string;
   date: Date;
 };
+
+export type QuoteData = {
+  id: React.Key;
+  quote_number: string;
+  email: string;
+  date: Date;
+  reference?: string;
+  site_address: string;
+  invoice: string;
+  total_price: number;
+  total_price_gst: number;
+  description: string;
+  note: string;
+  warranty: string;
+  details: QuoteDetailData[];
+}
+
+export type QuoteDetailData = {
+  id: React.Key;
+  work_scope: string;
+  price: number;
+  seq: number;
+}

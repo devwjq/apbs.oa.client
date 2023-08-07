@@ -1,7 +1,7 @@
 import InspectionStepForm from '@/pages/oa/project/components/InspectionStepForm';
 import QuotaStepForm from '@/pages/oa/project/components/QuotaStepForm';
 import RequirementStepForm from '@/pages/oa/project/components/RequirementStepForm';
-import type { InspectionData, ProjectData } from '@/services/data';
+import type {InspectionData, ProjectData, QuoteData} from '@/services/data';
 import { InspectorData } from '@/services/data';
 import { getInspection, updateInspection } from '@/services/inspection';
 import { getProject, updateProject } from '@/services/project';
@@ -217,7 +217,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               />
             </StepsForm.StepForm>
 
-            <StepsForm.StepForm<ProjectData>
+            <StepsForm.StepForm<QuoteData>
               title="Quota"
               // initialValues={data}
               onFinish={async (values) => {
@@ -228,8 +228,10 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               <QuotaStepForm
                 projectId={Number(data?.id)}
                 setStepForm={setStepForm}
+                email={props.projectData?.client?.email}
               />
             </StepsForm.StepForm>
+
             <StepsForm.StepForm<ProjectData>
               title="Assignment"
               // initialValues={data}
@@ -238,6 +240,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                 // return true;
               }}
             />
+
             <StepsForm.StepForm<ProjectData>
               title="Payment"
               // initialValues={data}

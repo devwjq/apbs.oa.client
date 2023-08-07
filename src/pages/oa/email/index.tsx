@@ -1,5 +1,5 @@
 import { EmailData, PaginationData } from '@/services/data';
-import { queryEmails } from '@/services/email';
+import { queryGmails } from '@/services/email';
 import { ScheduleOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
@@ -74,8 +74,7 @@ const EmailList: React.FC = () => {
         }}
         pagination={false}
         request={async (params, sort, filter) => {
-          console.log('request = ');
-          const response = await queryEmails(params);
+          const response = await queryGmails(params);
           if (response.oauthUrl) {
             console.log('oauthUrl = ' + response.oauthUrl);
             window.location.href = response.oauthUrl;

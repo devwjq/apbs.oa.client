@@ -17,11 +17,12 @@ import {ClientData, ContactData, PaginationData} from "@/services/data";
 import {getClientTypes, queryClients} from "@/services/client";
 import {getProjectContacts, getProjectTypes} from "@/services/project";
 import {debug} from "@/pages/Env";
+import {FormInstance} from "antd/lib";
 
 type FormProps = {
   projectId?: number;
   formRef: MutableRefObject<any>;
-  setStepForm: Function;
+  setStepForm: (step: number, form: FormInstance) => void;
 };
 
 const RequirementStepForm: React.FC<FormProps> = (props) => {

@@ -3,18 +3,22 @@ import styles from '@/pages/oa/project/style.less';
 import {ModalForm, ProFormDatePicker, ProFormText} from '@ant-design/pro-form';
 import {Button, Card, Col, Form, Row, Select, Switch, Tooltip} from 'antd';
 import moment from 'moment';
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {ProFormTextArea} from "@ant-design/pro-components";
-import {GoogleOutlined, MailOutlined} from "@ant-design/icons";
+import {GoogleOutlined, MailOutlined, PlusOutlined} from "@ant-design/icons";
 import ProTable, {ProColumns} from "@ant-design/pro-table";
 import {EmailData, PaginationData} from "@/services/data";
 import {queryGmails} from "@/services/email";
+import {HTML5Backend} from "react-dnd-html5-backend";
+import {DndProvider, useDrag, useDrop} from 'react-dnd'
+import {FormInstance} from "antd/lib";
+import {QuoteDetailContainer} from "@/pages/oa/project/components/QuoteDetailContainer";
 
 const { Option } = Select;
 
 type FormProps = {
   projectId?: number;
-  setStepForm: Function;
+  setStepForm: (step: number, form: FormInstance) => void;
   email?: string;
 };
 
@@ -48,8 +52,8 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
               }
             }}
     >
-      <Option value="email">Email</Option>
-      <Option value="gmail">Gmail</Option>
+      <Option value="email"><MailOutlined/> Email</Option>
+      <Option value="gmail"><GoogleOutlined/> Gmail</Option>
     </Select>
   );
 
@@ -116,13 +120,13 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
 
   return (
     <>
-      <Card className={styles.card} bordered={true}>
+      <Card className={styles.card} bordered={true} title="Quote" style={{marginBottom: 20}}>
         <ProFormText name="project_id" hidden={!debug} initialValue={props.projectId} disabled={true} fieldProps={{addonBefore: "Project ID"}}/>
         <ProFormText name="gmail" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Gmail Thread"}}/>
         <ProFormText name="oldEmail" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Old Email"}}/>
 
         <Row gutter={16}>
-          <Col lg={6} md={12} sm={24}>
+          <Col lg={12} md={12} sm={24}>
             <ProFormText
               label="Quote NO."
               name="quote_number"
@@ -131,19 +135,11 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
             />
           </Col>
           <Col lg={6} md={12} sm={24}>
-            <ProFormDatePicker
-              label="Date"
-              name="date"
-              rules={[{ required: true, message: 'Please select a date' }]}
-              initialValue={moment()}
-            />
-          </Col>
-          <Col lg={12} md={12} sm={24}>
             <ProFormText
-              label="Email"
+              label="Email / Gmail"
               name="email"
               initialValue={props.email}
-              tooltip="You can give a email or choose a Gmail to reply."
+              tooltip="You can sent the quote to a email or choose a Gmail to reply."
               fieldProps={{
                 addonBefore: emailAddonBefore,
                 onChange: (e) => {
@@ -167,7 +163,15 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
               ]}
             />
           </Col>
-          <Col lg={24} md={12} sm={24}>
+          <Col lg={6} md={12} sm={24}>
+            <ProFormDatePicker
+              label="Date"
+              name="date"
+              rules={[{ required: true, message: 'Please select a date' }]}
+              initialValue={moment()}
+            />
+          </Col>
+          <Col lg={24} md={24} sm={24}>
             <ProFormText
               label="Site Address"
               name="site_address"
@@ -176,15 +180,7 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
               ]}
             />
           </Col>
-          <Col lg={24} md={24} sm={24}>
-            <ProFormTextArea
-              label="Reference"
-              name="reference"
-              fieldProps={{width: "100%", autoSize: {minRows: 4, maxRows: 4}}}
-              rules={[{ required: false, message: 'Please input reference' }]}
-            />
-          </Col>
-          <Col lg={24} md={12} sm={24}>
+          <Col lg={12} md={12} sm={24}>
             <ProFormTextArea
               label="Invoice"
               name="invoice"
@@ -192,8 +188,34 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
               rules={[{ required: true, message: 'Please input invoice information' }]}
             />
           </Col>
+          <Col lg={12} md={12} sm={24}>
+            <ProFormTextArea
+              label="Reference"
+              name="reference"
+              fieldProps={{width: "100%", autoSize: {minRows: 4, maxRows: 4}}}
+              rules={[{ required: false, message: 'Please input reference' }]}
+            />
+          </Col>
+          <Col lg={24} md={24} sm={24}>
+            <ProFormTextArea
+              label="Description"
+              name="description"
+              fieldProps={{width: "100%", autoSize: {minRows: 4, maxRows: 10}}}
+              rules={[{ required: false, message: 'Please input description' }]}
+            />
+          </Col>
+          <Col lg={24} md={24} sm={24}>
+            <ProFormTextArea
+              label="Notes"
+              name="note"
+              fieldProps={{width: "100%", autoSize: {minRows: 4, maxRows: 10}}}
+              rules={[{ required: false, message: 'Please input notes' }]}
+            />
+          </Col>
         </Row>
       </Card>
+
+      <QuoteDetailContainer/>
 
       <ModalForm
         title="Choose Gmail"
@@ -228,6 +250,7 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
               //   },
               // }}
               manualRequest={true}
+              scroll={{ y: screen.height*0.4 }}
               request={async (params, sort, filter) => {
                 const response = await queryGmails(params);
                 if (response.oauthUrl) {
@@ -247,3 +270,4 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
 };
 
 export default QuotaStepForm;
+// export default DragDropContext(HTML5Backend)(QuotaStepForm);

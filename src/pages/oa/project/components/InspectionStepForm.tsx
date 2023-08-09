@@ -17,10 +17,11 @@ import ProTable, { EditableProTable } from '@ant-design/pro-table';
 import {Button, Card, Col, Form, Popconfirm, Row} from 'antd';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import React, {useState} from 'react';
+import {FormInstance} from "antd/lib";
 
 type FormProps = {
   projectId?: number;
-  setStepForm: Function;
+  setStepForm: (step: number, form: FormInstance) => void;
   inspectorDataSource: InspectorData[];
   setInspectorDataSource: Dispatch<SetStateAction<InspectorData[]>>;
 };

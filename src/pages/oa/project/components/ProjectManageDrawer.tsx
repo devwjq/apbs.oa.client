@@ -218,7 +218,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
             </StepsForm.StepForm>
 
             <StepsForm.StepForm<QuoteData>
-              title="Quota"
+              title="Quote"
               // initialValues={data}
               onFinish={async (values) => {
                 // setStep(values);

@@ -26,6 +26,8 @@ export type ProjectData = {
   status?: number;
   update_time?: Date;
   create_time?: Date;
+  inspection?: InspectionData;
+  quote?: QuoteData;
 };
 
 export type ClientData = {

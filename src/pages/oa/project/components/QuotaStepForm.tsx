@@ -3,21 +3,20 @@ import styles from '@/pages/oa/project/style.less';
 import {ModalForm, ProFormDatePicker, ProFormText} from '@ant-design/pro-form';
 import {Button, Card, Col, Form, Row, Select, Switch, Tooltip} from 'antd';
 import moment from 'moment';
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {ProFormTextArea} from "@ant-design/pro-components";
 import {GoogleOutlined, MailOutlined, PlusOutlined} from "@ant-design/icons";
 import ProTable, {ProColumns} from "@ant-design/pro-table";
-import {EmailData, PaginationData} from "@/services/data";
+import {EmailData, PaginationData, ProjectData} from "@/services/data";
 import {queryGmails} from "@/services/email";
-import {HTML5Backend} from "react-dnd-html5-backend";
-import {DndProvider, useDrag, useDrop} from 'react-dnd'
 import {FormInstance} from "antd/lib";
 import {QuoteDetailContainer} from "@/pages/oa/project/components/QuoteDetailContainer";
 
 const { Option } = Select;
 
 type FormProps = {
-  projectId?: number;
+  //projectId?: number;
+  projectData?: ProjectData;
   setStepForm: (step: number, form: FormInstance) => void;
   email?: string;
 };
@@ -28,29 +27,30 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
 
   const form = Form.useFormInstance();
   props.setStepForm(2, form);
-  form.setFieldValue("project_id", props.projectId);
+  form.setFieldValue("project_id", props.projectData?.id);
 
   const emailAddonBefore = (
-    <Select defaultValue="email"
-            onChange={(value) => {
-              if(value === "gmail") {
-                form.setFieldValue("email", "");
-                form.setFieldValue("gmail", "gmail");
-                form.setFieldValue("oldEmail", "");
-                // form.getFieldInstance("email").getFieldProps().setProperty("disabled" , "true");
-                handleGmailChooseModelVisible(true);
-              } else {
-                // form.getFieldInstance("email").disabled = false;
-                form.setFieldValue("email", "");
-                form.setFieldValue("gmail", "");
-                form.setFieldValue("oldEmail", "");
-              }
-            }}
-            onSelect={(value) => {
-              if(value === "gmail") {
-                handleGmailChooseModelVisible(true);
-              }
-            }}
+    <Select
+      defaultValue="email"
+      onChange={(value) => {
+        if(value === "gmail") {
+          form.setFieldValue("email", "");
+          form.setFieldValue("gmail", "gmail");
+          form.setFieldValue("oldEmail", "");
+          // form.getFieldInstance("email").getFieldProps().setProperty("disabled" , "true");
+          handleGmailChooseModelVisible(true);
+        } else {
+          // form.getFieldInstance("email").disabled = false;
+          form.setFieldValue("email", "");
+          form.setFieldValue("gmail", "");
+          form.setFieldValue("oldEmail", "");
+        }
+      }}
+      onSelect={(value) => {
+        if(value === "gmail") {
+          handleGmailChooseModelVisible(true);
+        }
+      }}
     >
       <Option value="email"><MailOutlined/> Email</Option>
       <Option value="gmail"><GoogleOutlined/> Gmail</Option>
@@ -121,7 +121,7 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
   return (
     <>
       <Card className={styles.card} bordered={true} title="Quote" style={{marginBottom: 20}}>
-        <ProFormText name="project_id" hidden={!debug} initialValue={props.projectId} disabled={true} fieldProps={{addonBefore: "Project ID"}}/>
+        <ProFormText name="project_id" hidden={!debug} initialValue={props.projectData?.id} disabled={true} fieldProps={{addonBefore: "Project ID"}}/>
         <ProFormText name="gmail" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Gmail Thread"}}/>
         <ProFormText name="oldEmail" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Old Email"}}/>
 
@@ -215,7 +215,8 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
         </Row>
       </Card>
 
-      <QuoteDetailContainer/>
+      <QuoteDetailContainer
+        />
 
       <ModalForm
         title="Choose Gmail"

@@ -13,6 +13,9 @@ import {Button, Drawer, Form, message, notification} from 'antd';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import React, { useRef, useState } from 'react';
 import {FormInstance} from "antd/lib";
+import {getQuote} from "@/services/quote";
+import update from "immutability-helper";
+import {DragItem} from "@/pages/oa/project/components/QuoteDetailContainer";
 
 type FormProps = {
   projectData?: ProjectData;
@@ -147,6 +150,15 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               formRef={requirementStepFormRef}
               title="Request"
               autoFocusFirstInput
+              request={async () => {
+                if (data?.id) {
+                  // setRequirementStepFormClientDisable(true);
+                  return await getProject({ id: Number(data?.id) });
+                }
+                // setRequirementStepFormClientDisable(false);
+                const nullProject = {} as ProjectData;
+                return nullProject;
+              }}
               onFinish={async (values?: ProjectData) => {
                 if (values) {
                   // const isClientDisabled = requirementStepFormClientDisable;
@@ -161,15 +173,6 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                   return response.result;
                 }
               }}
-              request={async () => {
-                if (data?.id) {
-                  // setRequirementStepFormClientDisable(true);
-                  return await getProject({ id: Number(data?.id) });
-                }
-                // setRequirementStepFormClientDisable(false);
-                const nullProject = {} as ProjectData;
-                return nullProject;
-              }}
             >
               <RequirementStepForm
                 projectId={Number(data?.id)}
@@ -181,6 +184,13 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
             <StepsForm.StepForm<InspectionData>
               title="Inspection"
               autoFocusFirstInput
+              request={async () => {
+                if (data?.id) {
+                  return await getInspection({ projectId: Number(data?.id) });
+                }
+                const nullInspection = {} as InspectionData;
+                return nullInspection;
+              }}
               onFinish={async (values?: InspectionData) => {
                 if(values && (!values.inspection_report || filterHTMLTag(values.inspection_report).length == 0)) {
                   values.inspection_report = "";
@@ -201,13 +211,6 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                   return success;
                 }
               }}
-              request={async () => {
-                if (data?.id) {
-                  return await getInspection({ projectId: Number(data?.id) });
-                }
-                const nullInspection = {} as InspectionData;
-                return nullInspection;
-              }}
             >
               <InspectionStepForm
                 projectId={Number(data?.id)}
@@ -220,13 +223,23 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
             <StepsForm.StepForm<QuoteData>
               title="Quote"
               // initialValues={data}
+              request={async () => {
+                if (data?.id) {
+                  const quote = await getQuote({ projectId: Number(data?.id) });
+                  setData(update(data, {quote: {$set: quote}}));
+                  return quote;
+                }
+                const nullQuote = {} as QuoteData;
+                return nullQuote;
+              }}
               onFinish={async (values) => {
                 // setStep(values);
                 // return true;
               }}
             >
               <QuotaStepForm
-                projectId={Number(data?.id)}
+                // projectId={Number(data?.id)}
+                projectData={data}
                 setStepForm={setStepForm}
                 email={props.projectData?.client?.email}
               />

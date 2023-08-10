@@ -1,12 +1,13 @@
 import type { Identifier, XYCoord } from 'dnd-core'
 import type { FC } from 'react'
-import React, {PropsWithChildren, useRef} from 'react'
-import {Input, Button, Card, Col, Row, Space} from "antd";
+import React, {PropsWithChildren, useRef, useState} from 'react'
+import {Button, Card, Col, Row, Space} from "antd";
 import {ProFormTextArea} from "@ant-design/pro-components";
-import {ProFormMoney, ProFormText} from "@ant-design/pro-form";
+import {ProFormMoney} from "@ant-design/pro-form";
 import {useDrag, useDrop} from "react-dnd";
-import {CloseCircleTwoTone, CloseOutlined, DeleteTwoTone, DollarTwoTone, PlusOutlined} from "@ant-design/icons";
+import {DeleteTwoTone} from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
+import {QuoteDetailData} from "@/services/data";
 
 const style = {
   border: '1px dashed gray',
@@ -24,31 +25,32 @@ type CardProps = PropsWithChildren<{
   moveCard: (dragIndex: number, hoverIndex: number) => void
 }>;
 
-interface DragItem {
-  type: string
-  id: number
-  index: number
-}
-
-export const QuoteItemCard: FC<CardProps> = (props) => {
+export const QuoteDetailCard: FC<CardProps> = (props) => {
   const ref = useRef<HTMLDivElement>(null)
+  const [subTitle, setSubTitle] = useState<string>("");
+
+  let initSubTitle = props.work;
+  if(initSubTitle.length > 40) {
+    initSubTitle = subTitle.substring(0, 37) + "...";
+  }
 
   const [{ handlerId }, drop] = useDrop<
-    DragItem,
+    QuoteDetailData,
     void,
     { handlerId: Identifier | null }
   >({
-    accept: "QuoteItemCard",
+    accept: "QuoteItemCard",  // 指明该区域允许接收的拖放物。可以是单个，也可以是数组，里面的值就是useDrag所定义的type
     collect(monitor) {
       return {
         handlerId: monitor.getHandlerId(),
       }
     },
-    hover(item: DragItem, monitor) {
+    // 拖拽物悬浮在拖放区域时，item为拖拽物携带的数据
+    hover(item: QuoteDetailData, monitor) {
       if (!ref.current) {
         return
       }
-      const dragIndex = item.index
+      const dragIndex = item.seq
       const hoverIndex = props.index
 
       // Don't replace items with themselves
@@ -90,30 +92,46 @@ export const QuoteItemCard: FC<CardProps> = (props) => {
       // Generally it's better to avoid mutations,
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
-      item.index = hoverIndex
+      item.seq = hoverIndex
     },
   })
 
+  // 第一个返回值isDragging是一个对象，主要放一些拖拽物的状态。后面会介绍，先不管
+  // 第二个返回值drag：顾名思义就是一个Ref，只要将它注入到DOM中，该DOM就会变成一个可拖拽的DOM
   const [{ isDragging }, drag] = useDrag({
-    type: "QuoteItemCard",
-    item: () => {
+    type: "QuoteItemCard",  // 给拖拽物命名，后面用于分辨该拖拽物是谁，支持string和symbol
+    item: () => { // 拖拽物所携带的数据，让后面一些事件可以拿到数据，已达到交互的目的
       return { id: props.id, index: props.index }
     },
+    // 这个monitor会提供拖拽物状态的信息，我会在下面罗列所有monitor支持的方法
     collect: (monitor: any) => ({
-      isDragging: monitor.isDragging(),
+      isDragging: monitor.isDragging(), // 是否处于拖拽状态
     }),
   })
 
+  //根据状态去获取样式
   const opacity = isDragging ? 0 : 1
+
+  //让目标DOM即能作为拖拽物，也能作为拖放区域
   drag(drop(ref))
+
   return (
+    // 注入Ref,现在这个DOM就可以拖拽了
     <ProCard bordered={false} ref={ref} style={{ ...style, opacity }} data-handler-id={handlerId}
       title={"Quote "+(props.index+1)}
-             subTitle="Subtitle test"
-      collapsible
+      subTitle={subTitle ? subTitle : initSubTitle}
       hoverable
+      collapsible
+      // defaultCollapsed
+      // onCollapse={(collapsed: boolean) => {
+      //   if(collapsed) {
+      //     setSubTitle();
+      //   } else {
+      //     setSubTitle("");
+      //   }
+      // }}
       extra={
-        <Space size="large" align="start" style={{paddingTop: 0, marginBottom: -25}}>
+        <Space size="large" align="start" style={{paddingTop: 0, marginBottom: -24}}>
           <ProFormMoney
             name={"price_"+props.id}
             fieldProps={{
@@ -146,7 +164,17 @@ export const QuoteItemCard: FC<CardProps> = (props) => {
         <Col lg={24} md={24} sm={24}>
           <ProFormTextArea
             name={"work_scope_"+props.id}
-            fieldProps={{width: "100%", autoSize: {minRows: 10}}}
+            fieldProps={{
+              width: "100%",
+              autoSize: {minRows: 10},
+              onChange: (e) => {
+                if(e.target.value.length <= 40) {
+                  setSubTitle(e.target.value);
+                } else {
+                  setSubTitle(e.target.value.substring(0, 37) + "...");
+                }
+              },
+            }}
             rules={[{ required: true, message: 'Please input scope of work' }]}
             initialValue={props.work}
           />

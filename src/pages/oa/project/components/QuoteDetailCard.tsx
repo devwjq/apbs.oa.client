@@ -3,11 +3,13 @@ import type { FC } from 'react'
 import React, {PropsWithChildren, useRef, useState} from 'react'
 import {Button, Card, Col, Row, Space} from "antd";
 import {ProFormTextArea} from "@ant-design/pro-components";
-import {ProFormMoney} from "@ant-design/pro-form";
+import {ProFormMoney, ProFormText} from "@ant-design/pro-form";
 import {useDrag, useDrop} from "react-dnd";
 import {DeleteTwoTone} from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import {QuoteDetailData} from "@/services/data";
+import ReactQuillEditor from "@/components/ReactQuillEditor";
+import {debug} from "@/pages/Env";
 
 const style = {
   border: '1px dashed gray',
@@ -18,19 +20,20 @@ const style = {
 }
 
 type CardProps = PropsWithChildren<{
-  id: number
-  work: string
-  price: number
-  index: number
+  id?: number
+  work_scope?: string
+  price?: number
+  seq: number
   moveCard: (dragIndex: number, hoverIndex: number) => void
 }>;
 
 export const QuoteDetailCard: FC<CardProps> = (props) => {
   const ref = useRef<HTMLDivElement>(null)
   const [subTitle, setSubTitle] = useState<string>("");
+  const [seq, setSeq] = useState(props.seq);
 
-  let initSubTitle = props.work;
-  if(initSubTitle.length > 40) {
+  let initSubTitle = props.work_scope;
+  if(initSubTitle && initSubTitle.length > 40) {
     initSubTitle = subTitle.substring(0, 37) + "...";
   }
 
@@ -51,7 +54,7 @@ export const QuoteDetailCard: FC<CardProps> = (props) => {
         return
       }
       const dragIndex = item.seq
-      const hoverIndex = props.index
+      const hoverIndex = props.seq
 
       // Don't replace items with themselves
       if (dragIndex === hoverIndex) {
@@ -93,6 +96,7 @@ export const QuoteDetailCard: FC<CardProps> = (props) => {
       // but it's good here for the sake of performance
       // to avoid expensive index searches.
       item.seq = hoverIndex
+      setSeq(hoverIndex);
     },
   })
 
@@ -101,7 +105,7 @@ export const QuoteDetailCard: FC<CardProps> = (props) => {
   const [{ isDragging }, drag] = useDrag({
     type: "QuoteItemCard",  // 给拖拽物命名，后面用于分辨该拖拽物是谁，支持string和symbol
     item: () => { // 拖拽物所携带的数据，让后面一些事件可以拿到数据，已达到交互的目的
-      return { id: props.id, index: props.index }
+      return { id: props.id, seq: props.seq } as QuoteDetailData;
     },
     // 这个monitor会提供拖拽物状态的信息，我会在下面罗列所有monitor支持的方法
     collect: (monitor: any) => ({
@@ -118,7 +122,7 @@ export const QuoteDetailCard: FC<CardProps> = (props) => {
   return (
     // 注入Ref,现在这个DOM就可以拖拽了
     <ProCard bordered={false} ref={ref} style={{ ...style, opacity }} data-handler-id={handlerId}
-      title={"Quote "+(props.index+1)}
+      title={"Quote "+(props.seq+1)}
       subTitle={subTitle ? subTitle : initSubTitle}
       hoverable
       collapsible
@@ -133,7 +137,7 @@ export const QuoteDetailCard: FC<CardProps> = (props) => {
       extra={
         <Space size="large" align="start" style={{paddingTop: 0, marginBottom: -24}}>
           <ProFormMoney
-            name={"price_"+props.id}
+            name={"price_"+props.seq}
             fieldProps={{
               precision: 2,
               addonBefore: "Price",
@@ -147,36 +151,54 @@ export const QuoteDetailCard: FC<CardProps> = (props) => {
             initialValue={props.price}
             min={0}
           />
-          <Button
-            type="default"
-            shape="circle"
-            key="workAddButton"
-            onClick={() => {
+          { seq!=0 ?
+            <Button
+              type="default"
+              shape="circle"
+              key="workAddButton"
+              onClick={() => {
 
-            }}
-          >
-            <DeleteTwoTone style={{ fontSize: '16px'}}/>
-          </Button>
+              }}
+            >
+              <DeleteTwoTone style={{ fontSize: '16px'}}/>
+            </Button>
+            :
+            null
+          }
         </Space>
       }
     >
       <Row gutter={16}>
         <Col lg={24} md={24} sm={24}>
-          <ProFormTextArea
-            name={"work_scope_"+props.id}
-            fieldProps={{
-              width: "100%",
-              autoSize: {minRows: 10},
-              onChange: (e) => {
-                if(e.target.value.length <= 40) {
-                  setSubTitle(e.target.value);
-                } else {
-                  setSubTitle(e.target.value.substring(0, 37) + "...");
-                }
-              },
-            }}
-            rules={[{ required: true, message: 'Please input scope of work' }]}
-            initialValue={props.work}
+          <ProFormText
+            name={"id_"+props.seq}
+            hidden={!debug}
+            disabled={true}
+            fieldProps={{addonBefore: "Quote Detail ID"}}
+            initialValue={props.id}
+          />
+          {/*<ProFormTextArea*/}
+          {/*  name={"work_scope_"+props.id}*/}
+          {/*  fieldProps={{*/}
+          {/*    width: "100%",*/}
+          {/*    autoSize: {minRows: 10},*/}
+          {/*    onChange: (e) => {*/}
+          {/*      if(e.target.value.length <= 40) {*/}
+          {/*        setSubTitle(e.target.value);*/}
+          {/*      } else {*/}
+          {/*        setSubTitle(e.target.value.substring(0, 37) + "...");*/}
+          {/*      }*/}
+          {/*    },*/}
+          {/*  }}*/}
+          {/*  rules={[{ required: true, message: 'Please input scope of work' }]}*/}
+          {/*  initialValue={props.work_scope}*/}
+          {/*/>*/}
+          <ReactQuillEditor
+            name={"work_scope_"+props.seq}
+            height="300px"
+            rules={[{ required: true, message: 'Please input work scope' }]}
+            // initialValue={props.work_scope}
+            initialValue="test"
           />
         </Col>
       </Row>

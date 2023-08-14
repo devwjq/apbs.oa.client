@@ -293,7 +293,6 @@ const RequirementStepForm: React.FC<FormProps> = (props) => {
                     value: item.id
                   });
                 });
-                console.log(selectValues);
                 return selectValues;
               }}
               placeholder="Please choose project type"

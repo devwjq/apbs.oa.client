@@ -12,6 +12,9 @@ let uploadFileNumber = 0;
 type Props = {
   name?: string;
   rules?: Rule[];
+  initialValue?: string;
+  width?: string;
+  height?: string;
 };
 
 const ReactQuillEditor: React.FC<Props> = (props) => {
@@ -70,8 +73,9 @@ const ReactQuillEditor: React.FC<Props> = (props) => {
     modules: modules,
     ref: editorRef,
     style: {
-      width: '100%',
-      height: '500px',
+      width: props.width ? props.width : '100%',
+      height: props.height ? props.height : '500px',
+      padding: 0,
       overflow: 'hidden',
       borderBottom: '1px solid #ccc',
     },
@@ -79,8 +83,8 @@ const ReactQuillEditor: React.FC<Props> = (props) => {
 
   return (
     <div>
-      <ProForm.Item name={props.name} rules={props.rules}>
-        <ReactQuill readOnly={reportEditorDisabled} {...options} />
+      <ProForm.Item name={props.name} rules={props.rules} >
+        <ReactQuill readOnly={reportEditorDisabled} {...options} defaultValue={props.initialValue} />
       </ProForm.Item>
       <Upload
         name="file" //上传类型为file，若填image可能会报错

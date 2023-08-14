@@ -97,6 +97,7 @@ export type QuoteData = {
   invoice: string;
   total_price: number;
   total_price_gst: number;
+  send: boolean;
   description: string;
   note: string;
   warranty: string;
@@ -104,8 +105,8 @@ export type QuoteData = {
 }
 
 export type QuoteDetailData = {
-  id: React.Key;
-  work_scope: string;
-  price: number;
+  id?: React.Key;
+  work_scope?: string;
+  price?: number;
   seq: number;
 }

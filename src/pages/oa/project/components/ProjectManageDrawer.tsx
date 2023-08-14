@@ -5,7 +5,7 @@ import type {InspectionData, ProjectData, QuoteData} from '@/services/data';
 import { InspectorData } from '@/services/data';
 import { getInspection, updateInspection } from '@/services/inspection';
 import { getProject, updateProject } from '@/services/project';
-import { LeftOutlined, RightOutlined, SaveOutlined } from '@ant-design/icons';
+import {LeftOutlined, MailOutlined, RightOutlined, SaveOutlined} from '@ant-design/icons';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import { StepsForm } from '@ant-design/pro-form';
 import { RouteContext } from '@ant-design/pro-layout';
@@ -15,7 +15,6 @@ import React, { useRef, useState } from 'react';
 import {FormInstance} from "antd/lib";
 import {getQuote} from "@/services/quote";
 import update from "immutability-helper";
-import {DragItem} from "@/pages/oa/project/components/QuoteDetailContainer";
 
 type FormProps = {
   projectData?: ProjectData;
@@ -88,24 +87,67 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
             current={step}
             onCurrentChange={changeStep}
             submitter={{
-              render: (props) => {
-                if (props.step === 0) {
+              render: (p) => {
+                if (p.step === 0) {
                   return (
                     <div style={{ textAlign: 'right', marginRight: 25 }}>
                       <Button
                         key="next"
                         type="primary"
-                        onClick={() => props.onSubmit?.()}
+                        onClick={() => p.onSubmit?.()}
                         style={{ marginRight: 10 }}
                       >
                         Save & Next <RightOutlined />
                       </Button>
                     </div>
                   );
-                } else if (props.step === 4) {
+                } else if (p.step === 2) {
                   return (
                     <div style={{ textAlign: 'right', marginRight: 25 }}>
-                      <Button key="pre" type="primary" onClick={() => props.onPre?.()}>
+                      <Button key="pre" onClick={() => p.onPre?.()} style={{ marginRight: 10 }}>
+                        <LeftOutlined /> Previous
+                      </Button>
+                      {props.projectData?.quote?.id ?
+                        <>
+                          <Button key="save" onClick={() => p.onSubmit?.()} style={{ marginRight: 10 }}>
+                            <SaveOutlined /> Save
+                          </Button>
+                          {props.projectData?.quote?.send ?
+                            <>
+                              <Button key="save" onClick={() => p.onSubmit?.()} style={{ marginRight: 10 }}>
+                                <SaveOutlined /> Save
+                              </Button>
+                              <Button key="next" type="primary" onClick={() => p.onSubmit?.()}>
+                                Next <RightOutlined />
+                              </Button>
+                            </>
+                            :
+                            <>
+                              <Button key="save" type="primary" onClick={() => p.onSubmit?.()} style={{ marginRight: 10 }}>
+                                <SaveOutlined /> Save
+                              </Button>
+                              <Button key="next" onClick={() => p.onSubmit?.()}>
+                                Next <RightOutlined />
+                              </Button>
+                            </>
+                          }
+                        </>
+                        :
+                        <>
+                          <Button key="save" type="primary" onClick={() => p.onSubmit?.()} style={{ marginRight: 10 }}>
+                            <SaveOutlined /> Save
+                          </Button>
+                          <Button key="send" onClick={() => p.onSubmit?.()}>
+                            <MailOutlined/> Send
+                          </Button>
+                        </>
+                      }
+                    </div>
+                  );
+                } else if (p.step === 4) {
+                  return (
+                    <div style={{ textAlign: 'right', marginRight: 25 }}>
+                      <Button key="pre" type="primary" onClick={() => p.onPre?.()}>
                         <LeftOutlined /> Previous
                       </Button>
                     </div>
@@ -113,10 +155,10 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                 } else {
                   return (
                     <div style={{ textAlign: 'right', marginRight: 25 }}>
-                      <Button key="pre" onClick={() => props.onPre?.()} style={{ marginRight: 10 }}>
+                      <Button key="pre" onClick={() => p.onPre?.()} style={{ marginRight: 10 }}>
                         <LeftOutlined /> Previous
                       </Button>
-                      <Button key="next" type="primary" onClick={() => props.onSubmit?.()}>
+                      <Button key="next" type="primary" onClick={() => p.onSubmit?.()}>
                         Save & Next <RightOutlined />
                       </Button>
                     </div>
@@ -232,9 +274,25 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                 const nullQuote = {} as QuoteData;
                 return nullQuote;
               }}
-              onFinish={async (values) => {
-                // setStep(values);
-                // return true;
+              onFinish={async (values?: QuoteData) => {
+                if(values && (!values.inspection_report || filterHTMLTag(values.inspection_report).length == 0)) {
+                  values.inspection_report = "";
+                }
+                if(values && (values.inspection_need == undefined || values.inspection_need)
+                  && (!values.inspection_report || values.inspection_report.length == 0)) {
+                  notificationApi.info({
+                    message: `Saved, awaiting the inspection report.`,
+                    description:
+                      'The inspection information has been saved, but the next step cannot be taken until the inspection report is completed.',
+                    placement: 'top',
+                    duration: 20,
+                  });
+                }
+                if (values) {
+                  const formData = { ...values, inspectors: inspectorDataSource };
+                  const success = await updateInspection(formData);
+                  return success;
+                }
               }}
             >
               <QuotaStepForm

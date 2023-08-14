@@ -216,6 +216,7 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
       </Card>
 
       <QuoteDetailContainer
+        projectData={props.projectData}
         />
 
       <ModalForm

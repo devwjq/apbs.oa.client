@@ -6,24 +6,24 @@ import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import styles from "@/pages/oa/project/style.less";
 import {Button, Card, Col, Row} from "antd";
-import {PlusOutlined} from "@ant-design/icons";
+import {CloseCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {ProjectData, QuoteDetailData} from "@/services/data";
+import {ProFormGroup, ProFormList} from "@ant-design/pro-form";
 
 type ContainerProps = PropsWithChildren<{
   projectData?: ProjectData;
 }>;
 
 export const QuoteDetailContainer: React.FC<ContainerProps> = (props) => {
-  let quoteDetaildata = [
-    {
-      work_scope: "",
-    }
-  ] as QuoteDetailData[];
-  if(props.projectData?.quote?.details && props.projectData?.quote?.details.length > 0) {
-    quoteDetaildata = props.projectData.quote.details;
-  }
+  const [cards, setCards] = useState<QuoteDetailData[]>([{
+    // id: 0,
+    // work_scope: "",
+    seq: 0,
+  }]);
 
-  const [cards, setCards] = useState(quoteDetaildata);
+  if(!cards && props.projectData?.quote?.details && props.projectData?.quote?.details.length > 0) {
+    setCards(props.projectData.quote.details);
+  }
 
   const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {
     setCards((prevCards: QuoteDetailData[]) =>
@@ -37,14 +37,15 @@ export const QuoteDetailContainer: React.FC<ContainerProps> = (props) => {
   }, [])
 
   const renderCard = useCallback(
-    (card: { id: number; work: string; price: number }, index: number) => {
+    (card: QuoteDetailData, index: number) => {
+      console.log("card.id = "+card?.id);
       return (
         <QuoteDetailCard
           key={card.id}
-          id={card.id}
-          work={card.work}
+          id={Number(card.id)}
+          work_scope={card.work_scope}
           price={card.price}
-          index={index}
+          seq={index}
           moveCard={moveCard}
         />
       )
@@ -69,8 +70,33 @@ export const QuoteDetailContainer: React.FC<ContainerProps> = (props) => {
       <Row gutter={16}>
         <Col lg={24} md={24} sm={24}>
           <DndProvider backend={HTML5Backend}>
-            {cards.map((card, i) => renderCard(card, i))}
+            {cards.map((card, index) => renderCard(card, index))}
           </DndProvider>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col lg={24} md={24} sm={24}>
+          <ProFormList
+            name="details"
+            label="Scope of Work"
+            // initialValue={[
+            //   {
+            //     value: '333',
+            //     label: '333',
+            //   },
+            // ]}
+            deleteIconProps={{
+              Icon: CloseCircleOutlined,
+              tooltipText: '不需要这行了',
+            }}
+          >
+            <ProFormGroup key="group">
+              <DndProvider backend={HTML5Backend}>
+                <ProFormText name="value" label="值" />
+                <ProFormText name="label" label="显示名称" />
+              </DndProvider>
+            </ProFormGroup>
+          </ProFormList>
         </Col>
       </Row>
     </Card>

@@ -74,31 +74,6 @@ export const QuoteDetailContainer: React.FC<ContainerProps> = (props) => {
           </DndProvider>
         </Col>
       </Row>
-      <Row gutter={16}>
-        <Col lg={24} md={24} sm={24}>
-          <ProFormList
-            name="details"
-            label="Scope of Work"
-            // initialValue={[
-            //   {
-            //     value: '333',
-            //     label: '333',
-            //   },
-            // ]}
-            deleteIconProps={{
-              Icon: CloseCircleOutlined,
-              tooltipText: '不需要这行了',
-            }}
-          >
-            <ProFormGroup key="group">
-              <DndProvider backend={HTML5Backend}>
-                <ProFormText name="value" label="值" />
-                <ProFormText name="label" label="显示名称" />
-              </DndProvider>
-            </ProFormGroup>
-          </ProFormList>
-        </Col>
-      </Row>
     </Card>
   )
 }

@@ -1,5 +1,5 @@
 import InspectionStepForm from '@/pages/oa/project/components/InspectionStepForm';
-import QuotaStepForm from '@/pages/oa/project/components/QuotaStepForm';
+import QuoteStepForm from '@/pages/oa/project/components/QuoteStepForm';
 import RequirementStepForm from '@/pages/oa/project/components/RequirementStepForm';
 import type {InspectionData, ProjectData, QuoteData} from '@/services/data';
 import { InspectorData } from '@/services/data';
@@ -13,7 +13,7 @@ import {Button, Drawer, Form, message, notification} from 'antd';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import React, { useRef, useState } from 'react';
 import {FormInstance} from "antd/lib";
-import {getQuote} from "@/services/quote";
+import {getQuote, updateQuote} from "@/services/quote";
 import update from "immutability-helper";
 
 type FormProps = {
@@ -72,6 +72,17 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
     setStep(value);
   };
 
+  const onQuoteStepFormSend = (submitProps: any) => {
+    stepForm[2].setFieldValue("action", "send");
+    submitProps.onSubmit?.();
+
+  }
+
+  const onQuoteStepFormNext = (submitProps: any) => {
+    stepForm[2].setFieldValue("action", "save");
+    submitProps.onSubmit?.();
+  }
+
   return (
     <>
       {contextHolder}
@@ -87,46 +98,46 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
             current={step}
             onCurrentChange={changeStep}
             submitter={{
-              render: (p) => {
-                if (p.step === 0) {
+              render: (submitProps) => {
+                if (submitProps.step === 0) { //Request
                   return (
                     <div style={{ textAlign: 'right', marginRight: 25 }}>
                       <Button
                         key="next"
                         type="primary"
-                        onClick={() => p.onSubmit?.()}
+                        onClick={() => submitProps.onSubmit?.()}
                         style={{ marginRight: 10 }}
                       >
                         Save & Next <RightOutlined />
                       </Button>
                     </div>
                   );
-                } else if (p.step === 2) {
+                } else if (submitProps.step === 2) {  //Quote
                   return (
                     <div style={{ textAlign: 'right', marginRight: 25 }}>
-                      <Button key="pre" onClick={() => p.onPre?.()} style={{ marginRight: 10 }}>
+                      <Button key="pre" onClick={() => submitProps.onPre?.()} style={{ marginRight: 10 }}>
                         <LeftOutlined /> Previous
                       </Button>
                       {props.projectData?.quote?.id ?
                         <>
-                          <Button key="save" onClick={() => p.onSubmit?.()} style={{ marginRight: 10 }}>
+                          <Button key="save" onClick={() => submitProps.onSubmit?.()} style={{ marginRight: 10 }}>
                             <SaveOutlined /> Save
                           </Button>
                           {props.projectData?.quote?.send ?
                             <>
-                              <Button key="save" onClick={() => p.onSubmit?.()} style={{ marginRight: 10 }}>
-                                <SaveOutlined /> Save
+                              <Button key="send" onClick={() => onQuoteStepFormSend(submitProps)} style={{ marginRight: 10 }}>
+                                <MailOutlined /> Send
                               </Button>
-                              <Button key="next" type="primary" onClick={() => p.onSubmit?.()}>
+                              <Button key="next" type="primary" onClick={() => onQuoteStepFormNext(submitProps)}>
                                 Next <RightOutlined />
                               </Button>
                             </>
                             :
                             <>
-                              <Button key="save" type="primary" onClick={() => p.onSubmit?.()} style={{ marginRight: 10 }}>
-                                <SaveOutlined /> Save
+                              <Button key="send" type="primary" onClick={() => onQuoteStepFormSend(submitProps)} style={{ marginRight: 10 }}>
+                                <MailOutlined /> Send
                               </Button>
-                              <Button key="next" onClick={() => p.onSubmit?.()}>
+                              <Button key="next" onClick={() => onQuoteStepFormNext(submitProps)}>
                                 Next <RightOutlined />
                               </Button>
                             </>
@@ -134,20 +145,20 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                         </>
                         :
                         <>
-                          <Button key="save" type="primary" onClick={() => p.onSubmit?.()} style={{ marginRight: 10 }}>
+                          <Button key="save" type="primary" onClick={() => submitProps.onSubmit?.()} style={{ marginRight: 10 }}>
                             <SaveOutlined /> Save
                           </Button>
-                          <Button key="send" onClick={() => p.onSubmit?.()}>
+                          <Button key="send" onClick={() => onQuoteStepFormSend(submitProps)}>
                             <MailOutlined/> Send
                           </Button>
                         </>
                       }
                     </div>
                   );
-                } else if (p.step === 4) {
+                } else if (submitProps.step === 4) {  //Payment
                   return (
                     <div style={{ textAlign: 'right', marginRight: 25 }}>
-                      <Button key="pre" type="primary" onClick={() => p.onPre?.()}>
+                      <Button key="pre" type="primary" onClick={() => submitProps.onPre?.()}>
                         <LeftOutlined /> Previous
                       </Button>
                     </div>
@@ -155,10 +166,10 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                 } else {
                   return (
                     <div style={{ textAlign: 'right', marginRight: 25 }}>
-                      <Button key="pre" onClick={() => p.onPre?.()} style={{ marginRight: 10 }}>
+                      <Button key="pre" onClick={() => submitProps.onPre?.()} style={{ marginRight: 10 }}>
                         <LeftOutlined /> Previous
                       </Button>
-                      <Button key="next" type="primary" onClick={() => p.onSubmit?.()}>
+                      <Button key="next" type="primary" onClick={() => submitProps.onSubmit?.()}>
                         Save & Next <RightOutlined />
                       </Button>
                     </div>
@@ -275,27 +286,14 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                 return nullQuote;
               }}
               onFinish={async (values?: QuoteData) => {
-                if(values && (!values.inspection_report || filterHTMLTag(values.inspection_report).length == 0)) {
-                  values.inspection_report = "";
-                }
-                if(values && (values.inspection_need == undefined || values.inspection_need)
-                  && (!values.inspection_report || values.inspection_report.length == 0)) {
-                  notificationApi.info({
-                    message: `Saved, awaiting the inspection report.`,
-                    description:
-                      'The inspection information has been saved, but the next step cannot be taken until the inspection report is completed.',
-                    placement: 'top',
-                    duration: 20,
-                  });
-                }
                 if (values) {
-                  const formData = { ...values, inspectors: inspectorDataSource };
-                  const success = await updateInspection(formData);
+                  const formData = { ...values };
+                  const success = await updateQuote(formData);
                   return success;
                 }
               }}
             >
-              <QuotaStepForm
+              <QuoteStepForm
                 // projectId={Number(data?.id)}
                 projectData={data}
                 setStepForm={setStepForm}

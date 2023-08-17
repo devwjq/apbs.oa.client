@@ -1,16 +1,43 @@
 import { debug } from '@/pages/Env';
 import styles from '@/pages/oa/project/style.less';
-import {ModalForm, ProFormDatePicker, ProFormText} from '@ant-design/pro-form';
-import {Button, Card, Col, Form, Row, Select, Switch, Tooltip} from 'antd';
+import {
+  FormListActionType,
+  ModalForm,
+  ProFormDatePicker, ProFormGroup,
+  ProFormList,
+  ProFormMoney,
+  ProFormText
+} from '@ant-design/pro-form';
+import {Button, Card, Col, Form, Popconfirm, Row, Select, Space, Switch, Tooltip} from 'antd';
 import moment from 'moment';
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {ProFormTextArea} from "@ant-design/pro-components";
-import {GoogleOutlined, MailOutlined, PlusOutlined} from "@ant-design/icons";
+import {
+  ArrowDownOutlined,
+  ArrowUpOutlined, DeleteOutlined,
+  DeleteTwoTone,
+  GoogleOutlined,
+  MailOutlined,
+  PlusOutlined
+} from "@ant-design/icons";
 import ProTable, {ProColumns} from "@ant-design/pro-table";
 import {EmailData, PaginationData, ProjectData} from "@/services/data";
 import {queryGmails} from "@/services/email";
 import {FormInstance} from "antd/lib";
 import {QuoteDetailContainer} from "@/pages/oa/project/components/QuoteDetailContainer";
+import {DndProvider} from "react-dnd";
+import {HTML5Backend} from "react-dnd-html5-backend";
+import ReactQuillEditor from "@/components/ReactQuillEditor";
+import ProCard from "@ant-design/pro-card";
+import {forEach} from "lodash";
+
+const detailCardStyle = {
+  border: '1px dashed gray',
+  // padding: '0.5rem 1rem',
+  marginBottom: '.5rem',
+  backgroundColor: 'white',
+  cursor: 'move',
+}
 
 const { Option } = Select;
 
@@ -21,13 +48,19 @@ type FormProps = {
   email?: string;
 };
 
-const QuotaStepForm: React.FC<FormProps> = (props) => {
+const QuoteStepForm: React.FC<FormProps> = (props) => {
   const [gmailChooseModelVisible, handleGmailChooseModelVisible] = useState<boolean>(false);
   const [chosenGmail, setChosenGmail] = useState<EmailData[]>();
 
   const form = Form.useFormInstance();
   props.setStepForm(2, form);
   form.setFieldValue("project_id", props.projectData?.id);
+
+  const detailCardActionRef = useRef<
+    FormListActionType<{
+      name: string;
+    }>
+  >();
 
   const emailAddonBefore = (
     <Select
@@ -52,8 +85,8 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
         }
       }}
     >
-      <Option value="email"><MailOutlined/> Email</Option>
-      <Option value="gmail"><GoogleOutlined/> Gmail</Option>
+      <Option value="email"><MailOutlined/></Option>
+      <Option value="gmail"><GoogleOutlined/></Option>
     </Select>
   );
 
@@ -124,6 +157,7 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
         <ProFormText name="project_id" hidden={!debug} initialValue={props.projectData?.id} disabled={true} fieldProps={{addonBefore: "Project ID"}}/>
         <ProFormText name="gmail" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Gmail Thread"}}/>
         <ProFormText name="oldEmail" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Old Email"}}/>
+        <ProFormText name="action" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Action"}}/>
 
         <Row gutter={16}>
           <Col lg={12} md={12} sm={24}>
@@ -168,7 +202,7 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
               label="Date"
               name="date"
               rules={[{ required: true, message: 'Please select a date' }]}
-              initialValue={moment()}
+              initialValue={moment().format('YYYY-MM-DD')}
             />
           </Col>
           <Col lg={24} md={24} sm={24}>
@@ -215,9 +249,161 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
         </Row>
       </Card>
 
-      <QuoteDetailContainer
-        projectData={props.projectData}
-        />
+      {/*<QuoteDetailContainer*/}
+      {/*  projectData={props.projectData}*/}
+      {/*  />*/}
+
+      <Card
+        className={styles.card}
+        bordered={true}
+        title="Work"
+        extra={[
+          <Space size="large" align="start" style={{paddingTop: 0, marginBottom: -24}}>
+            <ProFormText
+              name="total_price"
+              disabled={true}
+              fieldProps={{
+                addonBefore: "Total Price",
+                style: {width: "100%"},
+              }}
+              initialValue={0}
+            />
+            <ProFormText
+              name="gst"
+              disabled={true}
+              fieldProps={{
+                addonBefore: "GST",
+                style: {width: "100%"},
+              }}
+              initialValue={0}
+            />
+          </Space>
+        ]}
+      >
+        <ProFormList
+          name="details"
+          // label="Scope of Work"
+          min={1}
+          actionRef={detailCardActionRef}
+          initialValue={props.projectData?.quote?.details ? props.projectData?.quote?.details : [{
+
+          }]}
+          copyIconProps={false}
+          deleteIconProps={false}
+          itemRender={({ listDom, action }, { record }) => {
+            return (
+              <>
+                {listDom}
+              </>
+            );
+          }}
+        >
+          {(field, index, action, count) => {
+            return (
+              <ProCard
+                title={"Work " + (index + 1)}
+                style={{
+                  ...detailCardStyle,
+                  marginBlockEnd: 8,
+                }}
+                collapsible
+                extra={[
+                  <Space size="large" align="start" style={{paddingTop: 0, marginBottom: -24}}>
+                    <ProFormMoney
+                      name={"price"}
+                      fieldProps={{
+                        precision: 2,
+                        addonBefore: "Price",
+                        style: {width: "100%"},
+                        onChange: (e) => {
+                          let totalPrice = 0;
+                          const details = form.getFieldValue("details");
+                          details.forEach(function (detail : {price: number}) {
+                            totalPrice += detail.price;
+                          });
+                          const gst = Math.round(totalPrice*10.0)/100;
+                          form.setFieldValue("total_price", totalPrice);
+                          form.setFieldValue("gst", gst);
+                        },
+                      }}
+                      customSymbol=" "
+                      rules={[
+                        {required: true, message: 'Please input price'},
+                        {pattern: /^\d*(?:\.\d{0,2})?$/, message: 'Please input correct price'}
+                      ]}
+                      min={0}
+                    />
+                    { index == 0 ? null :
+                      <Button
+                        type="default"
+                        shape="circle"
+                        onClick={() => {
+                          action.move(index, index-1);
+                        }}
+                      >
+                        <ArrowUpOutlined />
+                      </Button>
+                    }
+                    { index == count -1 ? null :
+                      <Button
+                        type="default"
+                        shape="circle"
+                        onClick={() => {
+                          action.move(index, index+1);
+                        }}
+                      >
+                        <ArrowDownOutlined />
+                      </Button>
+                    }
+                    <Popconfirm
+                      key="deleteDetailConfirm"
+                      title="Delete this scope of work?"
+                      onConfirm={() => {
+                        if(count > 1) {
+                          action.remove(index);
+                        } else {
+                          alert("At least 1 scope of work is required.")
+                        }
+                      }}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Button
+                        type="default"
+                        shape="circle"
+                      >
+                        <DeleteOutlined style={{fontSize: '16px'}}/>
+                      </Button>
+                    </Popconfirm>
+                  </Space>
+                ]}
+              >
+                <Row gutter={16}>
+                  <Col lg={24} md={24} sm={24}>
+                    <ProFormText
+                      name={"id"}
+                      hidden={!debug}
+                      disabled={true}
+                      fieldProps={{addonBefore: "Quote Detail ID"}}
+                    />
+                    <ProFormText
+                      name={"seq"}
+                      hidden={!debug}
+                      disabled={true}
+                      fieldProps={{addonBefore: "Quote Detail Seq"}}
+                    />
+                    <ReactQuillEditor
+                      name={"work_scope"}
+                      height="300px"
+                      rules={[{required: true, message: 'Please input work scope'}]}
+                    />
+                  </Col>
+                </Row>
+              </ProCard>
+            )
+          }}
+        </ProFormList>
+      </Card>
 
       <ModalForm
         title="Choose Gmail"
@@ -271,5 +457,5 @@ const QuotaStepForm: React.FC<FormProps> = (props) => {
   );
 };
 
-export default QuotaStepForm;
+export default QuoteStepForm;
 // export default DragDropContext(HTML5Backend)(QuotaStepForm);

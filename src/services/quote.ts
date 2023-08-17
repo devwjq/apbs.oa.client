@@ -16,3 +16,13 @@ export async function getQuote (
     },
   });
 }
+
+export async function updateQuote(values: Record<string, any>) {
+  return request('/action/quote/addOrUpdate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: values,
+  });
+}

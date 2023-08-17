@@ -108,5 +108,5 @@ export type QuoteDetailData = {
   id?: React.Key;
   work_scope?: string;
   price?: number;
-  seq: number;
+  seq?: number;
 }

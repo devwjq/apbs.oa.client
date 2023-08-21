@@ -102,6 +102,7 @@ export type QuoteData = {
   note: string;
   warranty: string;
   details: QuoteDetailData[];
+  action?: string;
 }
 
 export type QuoteDetailData = {

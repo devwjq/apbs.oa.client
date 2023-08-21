@@ -13,7 +13,7 @@ import {Button, Drawer, Form, message, notification} from 'antd';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import React, { useRef, useState } from 'react';
 import {FormInstance} from "antd/lib";
-import {getQuote, updateQuote} from "@/services/quote";
+import {finishQuote, getQuote, sendQuote, updateQuote} from "@/services/quote";
 import update from "immutability-helper";
 
 type FormProps = {
@@ -79,7 +79,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
   }
 
   const onQuoteStepFormNext = (submitProps: any) => {
-    stepForm[2].setFieldValue("action", "save");
+    stepForm[2].setFieldValue("action", "next");
     submitProps.onSubmit?.();
   }
 
@@ -118,12 +118,12 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                       <Button key="pre" onClick={() => submitProps.onPre?.()} style={{ marginRight: 10 }}>
                         <LeftOutlined /> Previous
                       </Button>
-                      {props.projectData?.quote?.id ?
+                      {data?.quote?.id ?
                         <>
                           <Button key="save" onClick={() => submitProps.onSubmit?.()} style={{ marginRight: 10 }}>
                             <SaveOutlined /> Save
                           </Button>
-                          {props.projectData?.quote?.send ?
+                          {data?.quote?.send ?
                             <>
                               <Button key="send" onClick={() => onQuoteStepFormSend(submitProps)} style={{ marginRight: 10 }}>
                                 <MailOutlined /> Send
@@ -280,6 +280,7 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
                 if (data?.id) {
                   const quote = await getQuote({ projectId: Number(data?.id) });
                   setData(update(data, {quote: {$set: quote}}));
+                  console.log(data);
                   return quote;
                 }
                 const nullQuote = {} as QuoteData;
@@ -287,9 +288,33 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               }}
               onFinish={async (values?: QuoteData) => {
                 if (values) {
-                  const formData = { ...values };
-                  const success = await updateQuote(formData);
-                  return success;
+                  const formData = { ...values }
+
+                  if(values.action) {
+                    if(values.action === "send") {
+                      return await sendQuote(formData);
+                    } else if(values.action === "next") {
+                      return await finishQuote(formData);
+                    }
+                  }
+
+                  const quote = await updateQuote(formData);
+                  if(quote.success) {
+                    if (quote.id) {
+                      stepForm[2].setFieldValue("id", quote.id);
+                    }
+                    if (quote.quote_number) {
+                      stepForm[2].setFieldValue("quote_number", quote.quote_number);
+                    }
+
+                    notificationApi.info({
+                      message: `Saved.`,
+                      description:
+                        'The quote information has been saved',
+                      placement: 'top',
+                      duration: 20,
+                    });
+                  }
                 }
               }}
             >

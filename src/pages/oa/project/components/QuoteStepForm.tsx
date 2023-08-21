@@ -155,6 +155,7 @@ const QuoteStepForm: React.FC<FormProps> = (props) => {
     <>
       <Card className={styles.card} bordered={true} title="Quote" style={{marginBottom: 20}}>
         <ProFormText name="project_id" hidden={!debug} initialValue={props.projectData?.id} disabled={true} fieldProps={{addonBefore: "Project ID"}}/>
+        <ProFormText name="id" hidden={!debug} initialValue={props.projectData?.quote?.id} disabled={true} fieldProps={{addonBefore: "Quote ID"}}/>
         <ProFormText name="gmail" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Gmail Thread"}}/>
         <ProFormText name="oldEmail" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Old Email"}}/>
         <ProFormText name="action" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Action"}}/>
@@ -319,7 +320,7 @@ const QuoteStepForm: React.FC<FormProps> = (props) => {
                           let totalPrice = 0;
                           const details = form.getFieldValue("details");
                           details.forEach(function (detail : {price: number}) {
-                            totalPrice += detail.price;
+                            totalPrice = Number(totalPrice) + Number(detail.price);
                           });
                           const gst = Math.round(totalPrice*10.0)/100;
                           form.setFieldValue("total_price", totalPrice);

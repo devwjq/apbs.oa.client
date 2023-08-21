@@ -26,3 +26,23 @@ export async function updateQuote(values: Record<string, any>) {
     data: values,
   });
 }
+
+export async function sendQuote(values: Record<string, any>) {
+  return request('/action/quote/send', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: values,
+  });
+}
+
+export async function finishQuote(values: Record<string, any>) {
+  return request('/action/quote/finish', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: values,
+  });
+}

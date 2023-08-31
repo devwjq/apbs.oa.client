@@ -8,7 +8,20 @@ import {
   ProFormMoney,
   ProFormText
 } from '@ant-design/pro-form';
-import {Button, Card, Col, Form, Popconfirm, Row, Select, Space, Switch, Tooltip} from 'antd';
+import {
+  Button,
+  Card,
+  Col,
+  Descriptions,
+  DescriptionsProps,
+  Form,
+  Popconfirm,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Tooltip
+} from 'antd';
 import moment from 'moment';
 import React, {useRef, useState} from 'react';
 import {ProFormTextArea} from "@ant-design/pro-components";
@@ -64,7 +77,7 @@ const QuoteStepForm: React.FC<FormProps> = (props) => {
 
   const emailAddonBefore = (
     <Select
-      defaultValue="email"
+      defaultValue={props.projectData?.quote?.gmail ? "gmail" : "email"}
       onChange={(value) => {
         if(value === "gmail") {
           form.setFieldValue("email", "");
@@ -153,7 +166,7 @@ const QuoteStepForm: React.FC<FormProps> = (props) => {
 
   return (
     <>
-      <Card className={styles.card} bordered={true} title="Quote" style={{marginBottom: 20}}>
+      <Card className={styles.card} bordered={true} title="Summary" style={{marginBottom: 20}}>
         <ProFormText name="project_id" hidden={!debug} initialValue={props.projectData?.id} disabled={true} fieldProps={{addonBefore: "Project ID"}}/>
         <ProFormText name="id" hidden={!debug} initialValue={props.projectData?.quote?.id} disabled={true} fieldProps={{addonBefore: "Quote ID"}}/>
         <ProFormText name="gmail" hidden={!debug} disabled={true} fieldProps={{addonBefore: "Gmail Thread"}}/>
@@ -257,15 +270,14 @@ const QuoteStepForm: React.FC<FormProps> = (props) => {
       <Card
         className={styles.card}
         bordered={true}
-        title="Work"
+        title="Scope of Work"
         extra={[
           <Space size="large" align="start" style={{paddingTop: 0, marginBottom: -24}}>
             <ProFormText
-              name="total_price"
+              name="subtotal"
               disabled={true}
               fieldProps={{
-                addonBefore: "Total Price",
-                style: {width: "100%"},
+                addonBefore: "Subtotal",
               }}
               initialValue={0}
             />
@@ -274,12 +286,20 @@ const QuoteStepForm: React.FC<FormProps> = (props) => {
               disabled={true}
               fieldProps={{
                 addonBefore: "GST",
-                style: {width: "100%"},
+              }}
+              initialValue={0}
+            />
+            <ProFormText
+              name="total_price"
+              disabled={true}
+              fieldProps={{
+                addonBefore: "Total Price",
               }}
               initialValue={0}
             />
           </Space>
         ]}
+        style={{marginBottom: 20}}
       >
         <ProFormList
           name="details"
@@ -291,6 +311,10 @@ const QuoteStepForm: React.FC<FormProps> = (props) => {
           }]}
           copyIconProps={false}
           deleteIconProps={false}
+          creatorButtonProps={{
+            position: 'bottom',
+            creatorButtonText: 'Add a new work',
+          }}
           itemRender={({ listDom, action }, { record }) => {
             return (
               <>
@@ -310,30 +334,41 @@ const QuoteStepForm: React.FC<FormProps> = (props) => {
                 collapsible
                 extra={[
                   <Space size="large" align="start" style={{paddingTop: 0, marginBottom: -24}}>
-                    <ProFormMoney
-                      name={"price"}
-                      fieldProps={{
-                        precision: 2,
-                        addonBefore: "Price",
-                        style: {width: "100%"},
-                        onChange: (e) => {
-                          let totalPrice = 0;
-                          const details = form.getFieldValue("details");
-                          details.forEach(function (detail : {price: number}) {
-                            totalPrice = Number(totalPrice) + Number(detail.price);
-                          });
-                          const gst = Math.round(totalPrice*10.0)/100;
-                          form.setFieldValue("total_price", totalPrice);
-                          form.setFieldValue("gst", gst);
-                        },
-                      }}
-                      customSymbol=" "
-                      rules={[
-                        {required: true, message: 'Please input price'},
-                        {pattern: /^\d*(?:\.\d{0,2})?$/, message: 'Please input correct price'}
-                      ]}
-                      min={0}
-                    />
+                    {/*<ProFormText*/}
+                    {/*  name={"name"}*/}
+                    {/*  fieldProps={{*/}
+                    {/*    addonBefore: "Name",*/}
+                    {/*    style: {width: "100%"},*/}
+                    {/*  }}*/}
+                    {/*  rules={[{ required: true, message: 'Please input work name.' }]}*/}
+                    {/*/>*/}
+                    {/*<ProFormMoney*/}
+                    {/*  name={"price"}*/}
+                    {/*  width={180}*/}
+                    {/*  fieldProps={{*/}
+                    {/*    precision: 2,*/}
+                    {/*    addonBefore: "Price",*/}
+                    {/*    // style: {width: "50"},*/}
+                    {/*    onChange: (e) => {*/}
+                    {/*      let subtotal = 0;*/}
+                    {/*      const details = form.getFieldValue("details");*/}
+                    {/*      details.forEach(function (detail : {price: number}) {*/}
+                    {/*        subtotal = Number(subtotal) + Number(detail.price);*/}
+                    {/*      });*/}
+                    {/*      const gst = Math.round(subtotal*10.0)/100;*/}
+                    {/*      const totalPrice = subtotal + gst;*/}
+                    {/*      form.setFieldValue("subtotal", subtotal);*/}
+                    {/*      form.setFieldValue("gst", gst);*/}
+                    {/*      form.setFieldValue("total_price", totalPrice);*/}
+                    {/*    },*/}
+                    {/*  }}*/}
+                    {/*  customSymbol=" "*/}
+                    {/*  rules={[*/}
+                    {/*    {required: true, message: 'Please input price'},*/}
+                    {/*    {pattern: /^\d*(?:\.\d{0,2})?$/, message: 'Please input correct price'}*/}
+                    {/*  ]}*/}
+                    {/*  min={0}*/}
+                    {/*/>*/}
                     { index == 0 ? null :
                       <Button
                         type="default"
@@ -379,22 +414,63 @@ const QuoteStepForm: React.FC<FormProps> = (props) => {
                   </Space>
                 ]}
               >
+                <ProFormText
+                  name="detail_id"
+                  hidden={!debug}
+                  disabled={true}
+                  fieldProps={{addonBefore: "Quote Detail ID"}}
+                />
+                <ProFormText
+                  name="seq"
+                  hidden={!debug}
+                  disabled={true}
+                  fieldProps={{addonBefore: "Quote Detail Seq"}}
+                />
+                <Row gutter={16}>
+                  <Col lg={12} md={12} sm={24}>
+                    <ProFormText
+                      name={"name"}
+                      fieldProps={{
+                        addonBefore: "Name",
+                        // style: {width: "100%"},
+                      }}
+                      rules={[{ required: true, message: 'Please input work name.' }]}
+                      placeholder="Please input work name."
+                    />
+                  </Col>
+                  <Col lg={12} md={12} sm={24}>
+                    <ProFormMoney
+                      name={"price"}
+                      fieldProps={{
+                        precision: 2,
+                        addonBefore: "Price",
+                        // style: {width: "50"},
+                        onChange: (e) => {
+                          let subtotal = 0;
+                          const details = form.getFieldValue("details");
+                          details.forEach(function (detail : {price: number}) {
+                            subtotal = Number(subtotal) + Number(detail.price);
+                          });
+                          const gst = Math.round(subtotal*10.0)/100;
+                          const totalPrice = subtotal + gst;
+                          form.setFieldValue("subtotal", subtotal);
+                          form.setFieldValue("gst", gst);
+                          form.setFieldValue("total_price", totalPrice);
+                        },
+                      }}
+                      customSymbol=""
+                      rules={[
+                        {required: true, message: 'Please input price'},
+                        {pattern: /^\d*(?:\.\d{0,2})?$/, message: 'Please input correct price'}
+                      ]}
+                      min={0}
+                    />
+                  </Col>
+                </Row>
                 <Row gutter={16}>
                   <Col lg={24} md={24} sm={24}>
-                    <ProFormText
-                      name={"id"}
-                      hidden={!debug}
-                      disabled={true}
-                      fieldProps={{addonBefore: "Quote Detail ID"}}
-                    />
-                    <ProFormText
-                      name={"seq"}
-                      hidden={!debug}
-                      disabled={true}
-                      fieldProps={{addonBefore: "Quote Detail Seq"}}
-                    />
                     <ReactQuillEditor
-                      name={"work_scope"}
+                      name="work_scope"
                       height="300px"
                       rules={[{required: true, message: 'Please input work scope'}]}
                     />
@@ -404,6 +480,59 @@ const QuoteStepForm: React.FC<FormProps> = (props) => {
             )
           }}
         </ProFormList>
+      </Card>
+
+      <Card className={styles.card} bordered={true} title="Warranty" style={{marginBottom: 20}}>
+        <Row gutter={16}>
+          <Col lg={24} md={24} sm={24}>
+            <ReactQuillEditor
+              name="warranty"
+              height="300px"
+              rules={[{required: true, message: 'Please input warranty'}]}
+            />
+          </Col>
+        </Row>
+      </Card>
+
+      <Card className={styles.card} bordered={true} title="Price">
+        <Row gutter={16}>
+          <Col lg={6} md={6} sm={6}>
+            <ProFormText
+              label="Subtotal"
+              name="subtotal"
+              readonly={true}
+              fieldProps={{
+                addonBefore: "Subtotal",
+                prefix: "$"
+              }}
+              initialValue={0}
+            />
+          </Col>
+          <Col lg={6} md={6} sm={6}>
+            <ProFormText
+              label="GST"
+              name="gst"
+              readonly={true}
+              fieldProps={{
+                addonBefore: "GST",
+                prefix: "$"
+              }}
+              initialValue={0}
+            />
+          </Col>
+          <Col lg={6} md={6} sm={6}>
+            <ProFormText
+              label="Total Price"
+              name="total_price"
+              readonly={true}
+              fieldProps={{
+                addonBefore: "Total Price",
+                prefix: "$"
+              }}
+              initialValue={0}
+            />
+          </Col>
+        </Row>
       </Card>
 
       <ModalForm

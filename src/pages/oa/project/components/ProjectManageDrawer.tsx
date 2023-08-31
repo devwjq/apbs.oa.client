@@ -279,8 +279,9 @@ const ProjectManageDrawer: React.FC<FormProps> = (props) => {
               request={async () => {
                 if (data?.id) {
                   const quote = await getQuote({ projectId: Number(data?.id) });
-                  setData(update(data, {quote: {$set: quote}}));
-                  console.log(data);
+                  data.quote = quote;
+                  setData(update(data, {}));  //深度更新data
+                  // console.log(data);
                   return quote;
                 }
                 const nullQuote = {} as QuoteData;

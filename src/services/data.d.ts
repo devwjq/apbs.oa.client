@@ -90,6 +90,7 @@ export type EmailData = {
 export type QuoteData = {
   id: React.Key;
   quote_number: string;
+  gmail: string;
   email: string;
   date: Date;
   reference?: string;
